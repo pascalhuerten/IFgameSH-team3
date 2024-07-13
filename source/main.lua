@@ -6,23 +6,12 @@ import "ship"
 import "utils"
 import "camera"
 import "player"
-import "input"
 import "hud" -- DEMO
 local hud = hud() -- DEMO
 
 local gfx <const> = playdate.graphics
-local dt <const> = playdate.getElapsedTime()
-local shifParams = {
-	x = 200;
-    y = 200;
-    rotation = 0;
-    imagePath = "Resource/Schiffchen.png";
-	width = 96;
-	height = 40;
-	moveSpeed = 25;
-}
 
-local player = player(shifParams)
+local player = player()
 
 local function loadGame()
 	playdate.display.setRefreshRate(50) -- Sets framerate to 50 fps
@@ -33,10 +22,7 @@ end
 loadGame()
 
 local function updateGame()
-	params = {
-		deltaTime = dt
-	}
-	player:update(params)
+	player:update()
 	local cannonCount = 1
 	local sailCount = 5
 	hud:update({
