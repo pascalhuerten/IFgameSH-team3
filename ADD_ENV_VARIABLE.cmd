@@ -3,7 +3,7 @@
 :: Replace YOUR CUSTOM SDK PATH HERE with your custom path.
 :: Use \ as separator
 :: Must not end with \
-set SDKPATH="C:\users\mike\playdateSDK"
+set SDKPATH="YOUR CUSTOM SDK PATH HERE"
 
 
 if %SDKPATH% == "YOUR CUSTOM SDK PATH HERE" (
