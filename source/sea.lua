@@ -7,30 +7,41 @@ local gfx <const> = playdate.graphics
 
 function sea:init()
     self.waves = {}
-    self.waveImageTable = playdate.graphics.imagetable.new("Resource/wave.gif") -- Load the GIF once
+    self.waveImageTable = playdate.graphics.imagetable.new(config.waveImagePath) -- Load the GIF once
     local screenWidth, screenHeight = playdate.display.getSize()
     local spacing = 70
-    local rows = screenWidth / spacing -- Number of rows in the grid
-    local cols = screenHeight / spacing -- Number of columns in the grid
+    -- Correctly calculate the number of columns and rows based on screen dimensions
+    local cols = math.ceil(screenWidth / spacing) * 1.5 -- Number of columns in the grid
+    local rows = math.ceil(screenHeight / spacing) * 1.5 -- Number of rows in the grid
+    local noiseScale = 0.3 -- Adjust for more or less frequent waves
+    local repeatPattern = 0 -- No repeat
+    local octaves = 2 -- Number of octaves of noise
+    local persistence = 0.7 -- Influence of each successive octave
 
     for row = 1, rows do
         for col = 1, cols do
-            local waveSprite = playdate.graphics.sprite.new()
-            waveSprite:setSize(8, 4)
-            -- Calculate position based on row and column with spacing
-            -- Offset every second row by 50 pixels to the right
-            local xOffset = ((row % 2) == 0) and 25 or 0
-            local x = (col - 1) * spacing + 20 + xOffset -- Adjust starting position as needed and add xOffset
-            local y = (row - 1) * spacing + 20 -- Adjust starting position as needed
-            waveSprite.originalX = x
-            waveSprite.originalY = y
-            waveSprite:moveTo(x, y)
-            waveSprite:add()
-            waveSprite:setImage(self.waveImageTable:getImage(1))
-            waveSprite.frameCount = self.waveImageTable:getLength()
-            waveSprite.frame = (1 + row + col + col) % waveSprite.frameCount -- Start each wave at a different frame
-            waveSprite.timer = 0
-            table.insert(self.waves, waveSprite)
+            -- Generate Perlin noise value for current position
+            local noiseValue = playdate.graphics.perlin(col * noiseScale, row * noiseScale, 0, repeatPattern, octaves, persistence)
+            -- Use noise value to decide if a wave should be placed
+            if noiseValue > 0.5 then -- Threshold to decide if a wave should be placed
+                local waveSprite = playdate.graphics.sprite.new()
+                waveSprite:setSize(8, 4)
+                -- Correctly calculate position based on row and column with spacing
+                -- Offset every second row by 50 pixels to the right
+                local xOffset = ((row % 2) == 0) and 25 or 0
+                local yOffset = ((col % 2) == 0) and 25 or 0
+                local x = (col - 1) * spacing + 20 + xOffset -- Adjust starting position as needed and add xOffset
+                local y = (row - 1) * spacing + 20 + yOffset -- Adjust starting position as needed
+                waveSprite.originalX = x
+                waveSprite.originalY = y
+                waveSprite:moveTo(x, y)
+                waveSprite:add()
+                waveSprite:setImage(self.waveImageTable:getImage(1))
+                waveSprite.frameCount = self.waveImageTable:getLength()
+                waveSprite.frame = (1 + row + col) % waveSprite.frameCount -- Start each wave at a different frame
+                waveSprite.timer = 0
+                table.insert(self.waves, waveSprite)
+            end
         end
     end
 end
@@ -42,24 +53,18 @@ function sea:update(cameraX, cameraY)
         local drawX = waveSprite.originalX - cameraX
         local drawY = waveSprite.originalY - cameraY
 
-        -- Check if the wave is off-screen in the y direction
+        -- Loop wave on the y-axis
         if drawY < 0 then
-            -- Move the wave to the bottom of the screen
             waveSprite.originalY = waveSprite.originalY + screenHeight
-            drawY = waveSprite.originalY - cameraY
         elseif drawY > screenHeight then
-            -- Move the wave to the top of the screen
             waveSprite.originalY = waveSprite.originalY - screenHeight
-            drawY = waveSprite.originalY - cameraY
         end
+
+        -- Loop wave on the x-axis
         if drawX < 0 then
-            -- Move the wave to the right of the screen
             waveSprite.originalX = waveSprite.originalX + screenWidth
-            drawX = waveSprite.originalX - cameraX
         elseif drawX > screenWidth then
-            -- Move the wave to the left of the screen
             waveSprite.originalX = waveSprite.originalX - screenWidth
-            drawX = waveSprite.originalX - cameraX
         end
 
         waveSprite:moveTo(drawX, drawY)

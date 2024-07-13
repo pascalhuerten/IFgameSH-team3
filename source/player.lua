@@ -1,4 +1,5 @@
 class("player").extends()
+import "config"
 
 local gfx <const> = playdate.graphics
 local geom <const> = playdate.geometry
@@ -16,19 +17,19 @@ function player:init()
         x = 200;
         y = 200;
         direction = 0;
-        imagePath = "Resource/Schiffchen.png";
+        imagePath = config.playerShipImagePath;
         width = 96;
         height = 40;
         moveSpeed = 40;
     }
     self.ship = ship(shipParams)
     playdate.inputHandlers.push(self.myInputHandlers)
-    --self.camera = camera(self.ship.x, self.ship.y)
+    self.camera = camera(self.ship.x, self.ship.y)
 end
 
 function player:update()
     self.ship:update()
-    --self.camera:update(self.ship.x, self.ship.y)
+    self.camera:update(self.ship.x, self.ship.y)
 end
 
 function player:draw()

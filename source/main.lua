@@ -7,14 +7,13 @@ import "utils"
 import "camera"
 import "player"
 import "sea"
-import "input"
 import "hud" -- DEMO
 local hud = hud() -- DEMO
 
 local gfx <const> = playdate.graphics
 
-local player = player()
 local sea = sea()
+local player = player()
 
 local function loadGame()
 	playdate.display.setRefreshRate(50) -- Sets framerate to 50 fps
