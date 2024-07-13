@@ -41,4 +41,3 @@ function playdate.update()
 	drawGame()
 	playdate.drawFPS(0,0) -- FPS widget
 end
-

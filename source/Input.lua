@@ -2,6 +2,10 @@ local myInputHandlers = {
 
     AButtonDown = function ()
         
+    end;
+
+    getCrankChange = function ()
+        
     end
 
     --AButtonHeld()
@@ -30,5 +34,5 @@ local myInputHandlers = {
     --
     --upButtonUp()
     --
-    --cranked(change, acceleratedChange)
+    
 }
