@@ -1,12 +1,12 @@
+import "CoreLibs/object"
+
+class("input").extends()
+
 local myInputHandlers = {
 
-    AButtonDown = function ()
-        
-    end;
+    AButtonDown;
 
-    getCrankChange = function ()
-        
-    end
+    cranked;
 
     --AButtonHeld()
     --
@@ -33,6 +33,10 @@ local myInputHandlers = {
     --upButtonDown()
     --
     --upButtonUp()
-    --
-    
 }
+
+function input:init(player)
+    myInputHandlers.cranked = player.crankedCallback;
+    myInputHandlers.AButtonDown = player.AButtonDownCallback;
+    playdate.inputHandlers.push(myInputHandlers)
+end

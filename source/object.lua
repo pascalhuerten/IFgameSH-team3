@@ -19,11 +19,6 @@ function object:init(params)
     sprite:add()
 end
 
-function object:update(params)
-    self.x = self.y + params.dx;
-    self.y = self.y + params.dy;
-end
-
 function object:moveTo(x,y)
     self.x = x;
     self.y = y;
