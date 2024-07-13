@@ -17,11 +17,12 @@ function player:init()
         x = 200;
         y = 200;
         direction = 0;
-        imagePath = "Resource/Schiffchen.png";
+        imagePath = "Resource/ship.png";
         width = 96;
         height = 40;
         moveSpeed = 40;
     }
+    print(shipParams.imagePath)
     self.ship = ship(shipParams)
     playdate.inputHandlers.push(self.myInputHandlers)
     self.camera = camera(self.ship.x, self.ship.y)

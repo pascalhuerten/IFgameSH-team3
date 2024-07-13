@@ -6,17 +6,19 @@ function object:init(params)
     self.x = params.x;
     self.y = params.y;
     self.direction = params.direction;
-    local image = gfx.image.new(params.imagePath)
+    image = gfx.image.new(params.imagePath)
+    print(params.imagePath)
     if image == nil then
         error("no image found")
     end
     self.sprite = gfx.sprite.new(image)
-    if sprite == nil then
+    if self.sprite == nil then
         error("no image found")
     end
     self.sprite:setSize(params.width,params.height)
     self.sprite:moveTo(self.x, self.y)
     self.sprite:add()
+    self.sprite:setRotation(self.direction)
 end
 
 function object:move(moveSpeed)

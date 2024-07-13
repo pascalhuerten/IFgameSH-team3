@@ -3,6 +3,7 @@ import "object"
 class("ship").extends("object")
 
 function ship:init(params)
+    print(params.imagePath)
     self.super:init(params)
     self.desiredSpeed = params.moveSpeed;
     self.moveSpeed = 0;
