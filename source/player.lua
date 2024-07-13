@@ -1,6 +1,7 @@
 class("player").extends()
 
-local dt <const> = playdate.getElapsedTime()
+local gfx <const> = playdate.graphics
+local geom <const> = playdate.geometry
 
 function player:init()
     self.myInputHandlers = {
@@ -18,11 +19,11 @@ function player:init()
         imagePath = "Resource/Schiffchen.png";
         width = 96;
         height = 40;
-        moveSpeed = 25;
+        moveSpeed = 40;
     }
     self.ship = ship(shipParams)
     playdate.inputHandlers.push(self.myInputHandlers)
-    --self.camera = camera()
+    --self.camera = camera(self.ship.x, self.ship.y)
 end
 
 function player:update()
@@ -31,5 +32,6 @@ function player:update()
 end
 
 function player:draw()
-    self.ship:draw(0, 0)
+    -- Draw the waves relative to the camera position
+    self.ship:draw(self.camera.x, self.camera.y)
 end

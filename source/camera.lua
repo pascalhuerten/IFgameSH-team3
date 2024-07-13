@@ -1,8 +1,8 @@
 class("camera").extends()
 
-function camera:init()
-    self.x = 0
-    self.y = 0
+function camera:init(x, y)
+    self.x = x - playdate.display.getWidth() / 2
+    self.y = y - playdate.display.getHeight() / 2
 end
 
 -- Modified camera update function to use lerp
