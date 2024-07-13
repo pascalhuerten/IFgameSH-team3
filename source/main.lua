@@ -3,6 +3,9 @@ import "CoreLibs/graphics"
 import "CoreLibs/object"
 import "object"
 import "ship"
+import "utils"
+import "camera"
+import "player"
 import "input"
 import "hud" -- DEMO
 local hud = hud() -- DEMO
@@ -18,7 +21,8 @@ local shifParams = {
 	height = 40;
 	moveSpeed = 25;
 }
-local ship = ship(shifParams)
+
+local player = player(shifParams)
 
 local function loadGame()
 	playdate.display.setRefreshRate(50) -- Sets framerate to 50 fps
@@ -29,8 +33,10 @@ end
 loadGame()
 
 local function updateGame()
-	params = {deltaTime = dt;}
-	ship:update(params)
+	params = {
+		deltaTime = dt
+	}
+	player:update(params)
 	local cannonCount = 1
 	local sailCount = 5
 	hud:update({
@@ -41,7 +47,7 @@ end
 
 local function drawGame()
 	gfx.clear() -- Clears the screen
-	ship:draw(0,0)
+	player:draw()
 	gfx.sprite.update()
 	hud:draw()
 end
