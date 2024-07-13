@@ -6,12 +6,14 @@ import "ship"
 import "utils"
 import "camera"
 import "player"
+import "sea"
 import "input"
 import "hud" -- DEMO
 local hud = hud() -- DEMO
 
 local gfx <const> = playdate.graphics
 local dt <const> = playdate.getElapsedTime()
+
 local shifParams = {
 	x = 200;
     y = 200;
@@ -23,6 +25,8 @@ local shifParams = {
 }
 
 local player = player(shifParams)
+
+local sea = sea()
 
 local function loadGame()
 	playdate.display.setRefreshRate(50) -- Sets framerate to 50 fps
@@ -37,6 +41,7 @@ local function updateGame()
 		deltaTime = dt
 	}
 	player:update(params)
+	sea:update(player.camera.x, player.camera.y)
 	local cannonCount = 1
 	local sailCount = 5
 	hud:update({
@@ -53,6 +58,8 @@ local function drawGame()
 end
 
 function playdate.update()
+	deltaTime = playdate.getElapsedTime()
+	playdate.resetElapsedTime()
 	updateGame()
 	drawGame()
 	playdate.drawFPS(0,0) -- FPS widget
