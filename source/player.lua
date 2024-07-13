@@ -1,5 +1,6 @@
 import "ship"
 import "camera"
+import "collision"
 
 class("player").extends()
 import "config"

@@ -1,23 +1,22 @@
 import "object"
+import "cannonball"
 
 class("ship").extends("object")
 
 function ship:init(params)
-    print(params.imagePath)
     self.super:init(params)
     self.desiredSpeed = params.moveSpeed;
     self.moveSpeed = 0;
     self.rotationSpeed = 0;
     self.desiredRotationSpeed = 0;
     self.canMove = false;
-    --self.cannonBall = cannonball()
+    --self.cannonball = cannonball(params)
 end
 
 function ship:update()
     self.rotationSpeed = lerp(self.rotationSpeed,self.desiredRotationSpeed, 0.01)
     self:rotate(self.desiredRotationSpeed)
     self.rotationSpeed = lerp(self.rotationSpeed,self.rotationSpeed/2,0.01);
-    print(self.rotationSpeed)
     if(not self.canMove)then
         self.moveSpeed = lerp(self.moveSpeed, 0, 0.01)
         self:move(self.moveSpeed)
@@ -25,14 +24,15 @@ function ship:update()
         self.moveSpeed = lerp(self.moveSpeed, self.desiredSpeed, 0.01)
         self:move(self.moveSpeed)
     end
+    --self.cannonball:update() -- remove to main.lua
 end
 
 function ship:move(ms)
     self.super:move(ms);
 end
 
-function ship:shoot()
-    
+function ship:shoot(x,y)
+    --self.cannonball:shoot(x,y)
 end
 
 function ship:setRotationSpeed(value)

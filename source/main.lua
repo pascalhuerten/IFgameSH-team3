@@ -9,6 +9,8 @@ import "sea"
 import "player"
 import "sea"
 import "hud" -- DEMO
+import "cannonball"
+
 local hud = hud() -- DEMO
 
 local gfx <const> = playdate.graphics
