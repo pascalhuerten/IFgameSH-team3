@@ -23,11 +23,12 @@ function player:init()
         y = 200;
         direction = 0;
         imagePath = config.playerShipImagePath;
-        width = 96;
-        height = 40;
+        width = 74;
+        height = 74;
         moveSpeed = 40;
+        enableRotation = true;
     }
-    print(shipParams.imagePath)
+    
     self.ship = ship(shipParams)
     playdate.inputHandlers.push(self.myInputHandlers)
     self.camera = camera(self.ship.x, self.ship.y)
