@@ -7,16 +7,14 @@ import "ship"
 import "camera"
 import "sea"
 import "player"
-import "hud"
-
-MAX_TURN_SPEED = 60;
-
-local hud = hud()
+import "sea"
+import "hud" -- DEMO
+local hud = hud() -- DEMO
 
 local gfx <const> = playdate.graphics
 
-local player = player()
 local sea = sea()
+local player = player()
 
 local function loadGame()
 	playdate.display.setRefreshRate(50) -- Sets framerate to 50 fps

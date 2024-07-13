@@ -10,6 +10,7 @@ function ship:init(params)
     self.rotationSpeed = 0;
     self.desiredRotationSpeed = 0;
     self.canMove = false;
+    --self.cannonBall = cannonball()
 end
 
 function ship:update()
@@ -28,6 +29,10 @@ end
 
 function ship:move(ms)
     self.super:move(ms);
+end
+
+function ship:shoot()
+    
 end
 
 function ship:setRotationSpeed(value)

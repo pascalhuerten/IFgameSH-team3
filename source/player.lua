@@ -2,11 +2,15 @@ import "ship"
 import "camera"
 
 class("player").extends()
+import "config"
+
+local gfx <const> = playdate.graphics
+local geom <const> = playdate.geometry
 
 function player:init()
     self.myInputHandlers = {
         cranked = function (change, acceleratedChange)
-            local min = math.min(acceleratedChange, MAX_TURN_SPEED)
+            local min = math.min(acceleratedChange, 60)
             self.ship:setRotationSpeed(min * 2);
         end;
         AButtonDown = function()
@@ -17,7 +21,7 @@ function player:init()
         x = 200;
         y = 200;
         direction = 0;
-        imagePath = "Resource/ship.png";
+        imagePath = config.playerShipImagePath;
         width = 96;
         height = 40;
         moveSpeed = 40;
