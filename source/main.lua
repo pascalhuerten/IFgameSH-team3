@@ -1,28 +1,44 @@
-import "dvd" -- DEMO
-local dvd = dvd(1, -1) -- DEMO
+import "CoreLibs/timer"
+import "CoreLibs/graphics"
+import "CoreLibs/object"
+import "object"
+import "ship"
+import "input"
 
 local gfx <const> = playdate.graphics
+local dt <const> = playdate.getElapsedTime()
 local font = gfx.font.new('font/Mini Sans 2X') -- DEMO
+local shifParams = {
+	x = 200;
+    y = 200;
+    rotation = 0;
+    imagePath = "Resource/Schiffchen.png";
+	width = 96;
+	height = 40;
+	moveSpeed = 25;
+}
+local ship = ship(shifParams)
 
 local function loadGame()
-	playdate.display.setRefreshRate(50) -- Sets framerate to 50 fps
-	math.randomseed(playdate.getSecondsSinceEpoch()) -- seed for math.random
-	gfx.setFont(font) -- DEMO
+	
 end
 
+loadGame()
+
 local function updateGame()
-	dvd:update() -- DEMO
+	params = {deltaTime = dt;}
+	ship:update(params)
 end
 
 local function drawGame()
 	gfx.clear() -- Clears the screen
-	dvd:draw() -- DEMO
+	ship:draw(0,0)
+	gfx.sprite.update()
 end
-
-loadGame()
 
 function playdate.update()
 	updateGame()
 	drawGame()
 	playdate.drawFPS(0,0) -- FPS widget
 end
+
