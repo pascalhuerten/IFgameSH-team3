@@ -55,7 +55,6 @@ function wind:update(cameraX, cameraY)
         -- Move the windSprite relative to the camera
         local drawX = windSprite.originalX - cameraX
         local drawY = windSprite.originalY - cameraY
-        print(drawX, drawY)
         windSprite:moveTo(drawX, drawY)
         
         -- Update the timer and frame animation

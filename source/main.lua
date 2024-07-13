@@ -12,13 +12,12 @@ import "wind"
 import "hud" -- DEMO
 import "cannonball"
 
-local hud = hud() -- DEMO
-
 local gfx <const> = playdate.graphics
 
 local sea = sea()
-local wind = wind(40, math.pi * 0.8)
 local player = player()
+local wind = wind(40, math.pi * 0.8)
+local hud = hud()
 
 local function loadGame()
 	playdate.display.setRefreshRate(50) -- Sets framerate to 50 fps
