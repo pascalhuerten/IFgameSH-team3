@@ -8,6 +8,7 @@ import "camera"
 import "sea"
 import "player"
 import "sea"
+import "wind"
 import "hud" -- DEMO
 import "cannonball"
 
@@ -16,6 +17,7 @@ local hud = hud() -- DEMO
 local gfx <const> = playdate.graphics
 
 local sea = sea()
+local wind = wind(40, math.pi * 0.8)
 local player = player()
 
 local function loadGame()
@@ -29,6 +31,7 @@ loadGame()
 local function updateGame()
 	player:update()
 	sea:update(player.camera.x, player.camera.y)
+	wind:update(player.camera.x, player.camera.y)
 	local cannonCount = 1
 	local sailCount = 5
 	hud:update({
