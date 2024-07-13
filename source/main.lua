@@ -1,15 +1,17 @@
 import "CoreLibs/timer"
 import "CoreLibs/graphics"
 import "CoreLibs/object"
+import "utils"
 import "object"
 import "ship"
-import "utils"
 import "camera"
-import "player"
 import "sea"
-import "input"
-import "hud" -- DEMO
-local hud = hud() -- DEMO
+import "player"
+import "hud"
+
+MAX_TURN_SPEED = 60;
+
+local hud = hud()
 
 local gfx <const> = playdate.graphics
 
@@ -25,9 +27,6 @@ end
 loadGame()
 
 local function updateGame()
-	params = {
-		deltaTime = dt
-	}
 	player:update()
 	sea:update(player.camera.x, player.camera.y)
 	local cannonCount = 1

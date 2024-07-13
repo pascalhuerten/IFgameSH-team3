@@ -10,13 +10,13 @@ function object:init(params)
     if image == nil then
         error("no image found")
     end
-    sprite = gfx.sprite.new(image)
+    self.sprite = gfx.sprite.new(image)
     if sprite == nil then
         error("no image found")
     end
-    sprite:setSize(params.width,params.height)
-    sprite:moveTo(self.x, self.y)
-    sprite:add()
+    self.sprite:setSize(params.width,params.height)
+    self.sprite:moveTo(self.x, self.y)
+    self.sprite:add()
 end
 
 function object:move(moveSpeed)
@@ -36,6 +36,7 @@ end
 
 function object:draw(cameraX,cameraY)
     print(self.x, self.y)
-    sprite:moveTo(self.x - cameraX,self.y - cameraY);
+    self.sprite:moveTo(self.x - cameraX,self.y - cameraY);
+    self.sprite:setRotation(self.direction)
     --gfx.drawRotated(self.x - cameraX, self.y - cameraY,image, etc);
 end

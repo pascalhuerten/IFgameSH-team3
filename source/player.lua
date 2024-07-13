@@ -1,12 +1,13 @@
-class("player").extends()
+import "ship"
+import "camera"
 
-local gfx <const> = playdate.graphics
-local geom <const> = playdate.geometry
+class("player").extends()
 
 function player:init()
     self.myInputHandlers = {
         cranked = function (change, acceleratedChange)
-            self.ship:setRotationSpeed(acceleratedChange * 2);
+            local min = math.min(acceleratedChange, MAX_TURN_SPEED)
+            self.ship:setRotationSpeed(min * 2);
         end;
         AButtonDown = function()
             self.ship:switchCanMove();
@@ -23,12 +24,12 @@ function player:init()
     }
     self.ship = ship(shipParams)
     playdate.inputHandlers.push(self.myInputHandlers)
-    --self.camera = camera(self.ship.x, self.ship.y)
+    self.camera = camera(self.ship.x, self.ship.y)
 end
 
 function player:update()
     self.ship:update()
-    --self.camera:update(self.ship.x, self.ship.y)
+    self.camera:update(self.ship.x, self.ship.y)
 end
 
 function player:draw()

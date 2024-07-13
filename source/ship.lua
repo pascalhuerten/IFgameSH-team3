@@ -1,25 +1,26 @@
-import "utils"
-
-local dt<const> = 1/30;
+import "object"
 
 class("ship").extends("object")
 
 function ship:init(params)
     self.super:init(params)
-    self.maxSpeed = params.moveSpeed;
+    self.desiredSpeed = params.moveSpeed;
     self.moveSpeed = 0;
     self.rotationSpeed = 0;
+    self.desiredRotationSpeed = 0;
     self.canMove = false;
 end
 
 function ship:update()
-    self:rotate(self.rotationSpeed)
+    self.rotationSpeed = lerp(self.rotationSpeed,self.desiredRotationSpeed, 0.01)
+    self:rotate(self.desiredRotationSpeed)
     self.rotationSpeed = lerp(self.rotationSpeed,self.rotationSpeed/2,0.01);
+    print(self.rotationSpeed)
     if(not self.canMove)then
-        self.moveSpeed = lerp(self.moveSpeed, self.moveSpeed/2, 0.01)
+        self.moveSpeed = lerp(self.moveSpeed, 0, 0.01)
         self:move(self.moveSpeed)
-        return 
     else
+        self.moveSpeed = lerp(self.moveSpeed, self.desiredSpeed, 0.01)
         self:move(self.moveSpeed)
     end
 end
@@ -29,9 +30,7 @@ function ship:move(ms)
 end
 
 function ship:setRotationSpeed(value)
-    if(self.canMove) then
-        self.rotationSpeed = value
-    end
+    self.desiredRotationSpeed = value
 end
 
 function ship:switchCanMove()
