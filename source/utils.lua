@@ -30,3 +30,22 @@ function makeRotationImageTable(image, segments)
     end
     return image_table
 end
+
+function loadImage(imagePath)
+    local image = gfx.image.new(imagePath)
+    if not image then
+        error("no image found")
+    end
+    return image
+end
+
+function isGif(imagePath)
+    return imagePath:lower():match("%.gif$")
+end
+
+function createSpriteFromImage(image)
+    local sprite = gfx.sprite.new(image)
+    sprite:setSize(image:getSize())
+    sprite:add()
+    return sprite
+end
