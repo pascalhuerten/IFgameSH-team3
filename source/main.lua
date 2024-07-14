@@ -15,17 +15,14 @@ import "cannonball"
 import "enemy"
 import "SoundController"
 
-local objects = {
+objects = {
 }
-local objectCount = 0
 function registerObject(object)
-	--key = tostring(objectCount)
-	--objectCount += 1
+	print("registering...", object)
 	table.insert(objects,object)
 end
 
 function destroyObject(object)
-	print("remove")
 	for i,v in pairs(objects) do
 		if(v == object) then table.remove(objects, v); return end
 	end
@@ -40,7 +37,7 @@ local player = player()
 local camera = camera(player.ship.x, player.ship.y)
 local wind = wind(40, math.pi * 0.8)
 local hud = hud()
-local enemy = enemy(player.ship);
+--local enemy = enemy(player.ship);
 soundController = SoundController()
 
 
@@ -60,7 +57,7 @@ end
 loadGame()
 print(#objects)
 local function updateGame()
-	enemy:update()
+	--enemy:update()
 	for i,v in pairs(objects) do
 		v:update()
 	end

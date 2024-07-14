@@ -89,6 +89,7 @@ function ship:shootLeft()
 end
 
 function ship:setRotationSpeed(value)
+    print(value)
     if(self:getCrewAtSailFactor() ~= 0) then
         self.desiredRotationSpeed = value
     else
