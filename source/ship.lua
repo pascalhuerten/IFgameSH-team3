@@ -25,7 +25,7 @@ function ship:init(x, y, width, height, direction, imagePath, enableRotation, ma
     self.collideTime = 2;
     self.shootTimer = 0;
     self.canShoot = true;
-    self.maxReloadTime = 5.0
+    self.maxReloadTime = 3
 end
 
 function ship:getTimeToShoot()
@@ -69,6 +69,9 @@ end
 
 function ship:shoot()
     if(self.canShoot)then
+        if(self:getCrewAtCannonsFactor() == 0) then
+            return
+        end
         self.canShoot = false
         self.cannonball:shoot(self.x + self.width/2, self.y + self.height/2, self.direction + 90, self.dx, self.dy)
     end

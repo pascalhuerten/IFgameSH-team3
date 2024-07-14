@@ -6,7 +6,7 @@ function enemy:init(player)
 end
 
 function enemy:update()
-    local distance = (self.ship.x - self.target.x) + (self.ship.y + self.target.y);
+    local distance = (self.target.x - self.ship.x) * (self.target.x - self.ship.x) + (self.target.y - self.ship.y) *  (self.target.y - self.ship.y);
     local directionX = self.ship.x - self.target.x
     local directionY = self.ship.x - self.target.y
     local direction = xyToDegrees(directionX, directionY)
