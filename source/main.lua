@@ -15,6 +15,22 @@ import "cannonball"
 import "enemy"
 import "SoundController"
 
+local objects = {
+}
+local objectCount = 0
+function registerObject(object)
+	--key = tostring(objectCount)
+	--objectCount += 1
+	table.insert(objects,object)
+end
+
+function destroyObject(object)
+	print("remove")
+	for i,v in pairs(objects) do
+		if(v == object) then table.remove(objects, v); return end
+	end
+end
+
 local gfx <const> = playdate.graphics
 
 
@@ -27,17 +43,7 @@ local hud = hud()
 local enemy = enemy(player.ship);
 soundController = SoundController()
 
-local objects = {
-}
 
-function registerObject(object)
-	key = tostring(#object)
-	objects[key] = object
-end
-
-function destroyObject(key)
-	table.remove(objects,key)
-end
 
 local function loadGame()
 	playdate.display.setRefreshRate(50) -- Sets framerate to 50 fps
@@ -52,13 +58,12 @@ local function loadGame()
 end
 
 loadGame()
+print(#objects)
 local function updateGame()
-	player:update()
 	enemy:update()
 	for i,v in pairs(objects) do
 		v:update()
 	end
-	player:update()
 	camera:update(player.ship.x, player.ship.y)
 	cameraX, cameraY = camera.x, camera.y
 	detectCollision()

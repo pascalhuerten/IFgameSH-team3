@@ -28,10 +28,6 @@ function player:init()
     playdate.inputHandlers.push(self.myInputHandlers)
 end
 
-function player:update()
-    
-end
-
 function player:draw()
     self.ship:draw()
 end

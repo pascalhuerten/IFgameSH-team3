@@ -71,7 +71,6 @@ end
 
 function ship:shootRight()
     if(self.canShootRight)then
-        print("shotright")
         if(self:getCrewAtCannonsFactor() == 0) then
             return
         end
@@ -80,7 +79,6 @@ function ship:shootRight()
     end
 end
 function ship:shootLeft()
-    print("shotleft")
     if(self.canShootLeft)then
         if(self:getCrewAtCannonsFactor() == 0) then
             return
