@@ -3,37 +3,39 @@ import "cannonball"
 
 class("ship").extends("object")
 
-function ship:init(params)
-    print(params)
-    ship.super.init(self,params)
-    self.desiredSpeed = params.moveSpeed;
+function ship:init(x, y, width, height, moveSpeed, direction, imagePath, enableRotation, maxSpeed)
+    -- self.super = object(x, y, width, height, direction, imagePath, enableRotation)
+    ship.super.init(self, x, y, width, height, direction, imagePath, enableRotation)
+    self.desiredSpeed = moveSpeed;
     self.moveSpeed = 0;
+    self.maxSpeed = maxSpeed;
     self.rotationSpeed = 0;
     self.desiredRotationSpeed = 0;
     self.canMove = false;
-    self.cannonball = cannonball(params)
+    local cannonballDirection = 0
+    self.cannonball = cannonball(x, y, 4, 4, 60, cannonballDirection, config.cannonBallImagePath, false)
+    self.dx =0;
+    self.dy = 0;
 end
 
 function ship:update()
-    self.rotationSpeed = lerp(self.rotationSpeed,self.desiredRotationSpeed, 0.01)
+    self.rotationSpeed = lerp(self.rotationSpeed, self.desiredRotationSpeed, 0.01)
     self:rotate(self.desiredRotationSpeed)
-    self.rotationSpeed = lerp(self.rotationSpeed,self.rotationSpeed/2,0.01);
-    if(not self.canMove)then
+    self.rotationSpeed = lerp(self.rotationSpeed, self.rotationSpeed / 2, 0.01);
+    local dirX,dirY = convertDegreesToXY(self.direction)
+    self.dx = self.moveSpeed * dirX * 1/30;
+    self.dy = self.moveSpeed * dirY * 1/30;
+    if (not self.canMove) then
         self.moveSpeed = lerp(self.moveSpeed, 0, 0.01)
-        self:move(self.moveSpeed)
+        self:move(self.dx,self.dy)
     else
         self.moveSpeed = lerp(self.moveSpeed, self.desiredSpeed, 0.01)
-        self:move(self.moveSpeed)
+        self:move(self.dx,self.dy)
     end
-    self.cannonball:update() -- remove to main.lua
+    self.cannonball:update()
 end
-
-function ship:move(ms)
-    self.super:move(ms);
-end
-
-function ship:shoot(x,y)
-    self.cannonball:shoot(x,y)
+function ship:shoot()
+    self.cannonball:shoot(self.x, self.y, self.direction + 90, self.dx, self.dy)
 end
 
 function ship:setRotationSpeed(value)
@@ -42,15 +44,12 @@ end
 
 function ship:switchCanMove()
     self.canMove = not (self.canMove);
-    if(self.canMove) then 
+    if (self.canMove) then
         self.moveSpeed = self.maxSpeed;
     end
 end
 
-function ship:rotate(rs)
-    self.super:rotate(rs);
-end
-
 function ship:draw(cameraX, cameraY)
-    self.super:draw(cameraX, cameraY)
+    ship.super.draw(self, cameraX, cameraY)
+    self.cannonball:draw(cameraX, cameraY)
 end

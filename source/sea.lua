@@ -9,11 +9,11 @@ function sea:init()
     self.waves = {}
     self.waveImageTable = playdate.graphics.imagetable.new(config.waveImagePath) -- Load the GIF once
     local screenWidth, screenHeight = playdate.display.getSize()
-    local spacing = 70
+    local spacing = 50
     -- Correctly calculate the number of columns and rows based on screen dimensions
-    local cols = math.ceil(screenWidth / spacing) * 1.5 -- Number of columns in the grid
-    local rows = math.ceil(screenHeight / spacing) * 1.5 -- Number of rows in the grid
-    local noiseScale = 0.3 -- Adjust for more or less frequent waves
+    local cols = math.ceil(screenWidth / spacing) -- Number of columns in the grid
+    local rows = math.ceil(screenHeight / spacing) -- Number of rows in the grid
+    local noiseScale = 0.5 -- Adjust for more or less frequent waves
     local repeatPattern = 0 -- No repeat
     local octaves = 2 -- Number of octaves of noise
     local persistence = 0.7 -- Influence of each successive octave
@@ -30,15 +30,15 @@ function sea:init()
                 -- Offset every second row by 50 pixels to the right
                 local xOffset = ((row % 2) == 0) and 25 or 0
                 local yOffset = ((col % 2) == 0) and 25 or 0
-                local x = (col - 1) * spacing + 20 + xOffset -- Adjust starting position as needed and add xOffset
+                local x = (col - 1) * spacing + 20 -- Adjust starting position as needed and add xOffset
                 local y = (row - 1) * spacing + 20 + yOffset -- Adjust starting position as needed
                 waveSprite.originalX = x
                 waveSprite.originalY = y
                 waveSprite:moveTo(x, y)
                 waveSprite:add()
-                waveSprite:setImage(self.waveImageTable:getImage(1))
                 waveSprite.frameCount = self.waveImageTable:getLength()
-                waveSprite.frame = (1 + row + col) % waveSprite.frameCount -- Start each wave at a different frame
+                waveSprite.frame = (1 + row + col) % waveSprite.frameCount + 1-- Start each wave at a different frame
+                waveSprite:setImage(self.waveImageTable:getImage(waveSprite.frame))
                 waveSprite.timer = 0
                 table.insert(self.waves, waveSprite)
             end
