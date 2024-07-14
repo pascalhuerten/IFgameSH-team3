@@ -25,7 +25,7 @@ function ship:init(x, y, width, height, direction, imagePath, enableRotation, ma
     self.collideTime = 2;
     self.shootTimer = 0;
     self.canShoot = true;
-    self.maxReloadTime = 3
+    self.maxReloadTime = 3.0
 end
 
 function ship:getTimeToShoot()

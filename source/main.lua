@@ -13,6 +13,7 @@ import "wind"
 import "hud" -- DEMO
 import "cannonball"
 import "enemy"
+import "SoundController"
 
 local gfx <const> = playdate.graphics
 
@@ -24,6 +25,7 @@ local camera = camera(player.ship.x, player.ship.y)
 local wind = wind(40, math.pi * 0.8)
 local hud = hud()
 local enemy = enemy(player.ship);
+soundController = SoundController()
 
 local objects = {
 	one = player.ship;
@@ -37,6 +39,12 @@ local function loadGame()
 	playdate.display.setRefreshRate(50) -- Sets framerate to 50 fps
 	math.randomseed(playdate.getSecondsSinceEpoch()) -- seed for math.random
 	-- gfx.setFont(font) -- DEMO
+
+	-- SoundController:playBattleSoundtrack()
+	-- SoundController:playCannonShot()
+	-- SoundController:playCannonHit()
+	
+	soundController:playIdleSoundtrack()
 end
 
 loadGame()
@@ -59,6 +67,12 @@ local function updateGame()
 		crewAtCannons = player.ship.crewAtCannons,
 		crewAtSail = player.ship.crewAtSail
 	})
+
+	if kraken.sprite:isVisible() then
+        soundController:playBattleSoundtrack()
+    else
+		soundController:playIdleSoundtrack()
+    end
 end
 
 function detectCollision()
