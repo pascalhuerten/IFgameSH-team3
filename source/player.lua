@@ -16,20 +16,13 @@ function player:init()
         end;
         AButtonDown = function()
             self.ship:switchCanMove();
+        end;
+        BButtonDown = function ()
+            self.ship:shoot()
         end
     };
-    local shipParams = {
-        x = 200;
-        y = 200;
-        direction = 0;
-        imagePath = config.playerShipImagePath;
-        width = 74;
-        height = 74;
-        moveSpeed = 40;
-        enableRotation = true;
-    }
     
-    self.ship = ship(shipParams)
+    self.ship = ship(200, 200, 74, 74, 40, 0, config.playerShipImagePath, true, 50)
     playdate.inputHandlers.push(self.myInputHandlers)
     self.camera = camera(self.ship.x, self.ship.y)
 end

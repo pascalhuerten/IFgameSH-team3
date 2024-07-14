@@ -2,18 +2,18 @@ local gfx <const> = playdate.graphics
 
 class("object").extends()
 
-function object:init(params)
-    self.x = params.x
-    self.y = params.y
-    self.direction = params.direction
+function object:init(x, y, width, height, direction, imagePath, enableRotation)
+    self.x = x
+    self.y = y
+    self.direction = direction
     
-    local image = gfx.image.new(params.imagePath)
+    local image = gfx.image.new(imagePath)
     if image == nil then
         error("no image found")
     end
     
     -- Check if rotation is enabled and generate imagetable
-    if params.enableRotation then
+    if enableRotation then
         self.imageTable = makeRotationImageTable(image, 72)
         image = self.imageTable:getImage(1)
         self.sprite = gfx.sprite.new(image)

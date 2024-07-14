@@ -1,10 +1,10 @@
 class("cannonball").extends("object")
 
-function cannonball:init(params)
-    params.imagePath = "Resource/cannonball.png";
-    self.super:init(params)
-    self.speed = params.speed
-    self.direction = direction
+function cannonball:init(x, y, width, height, moveSpeed, direction, imagePath, enableRotation)
+    print(config.cannonBallImagePath)
+    self.moveSpeed = moveSpeed
+    -- self.super = object(x, y, width, height, direction, config.cannonBallImagePath, enableRotation)
+    cannonball.super.init(self, x, y, width, height, direction, config.cannonBallImagePath, enableRotation)
     self.active = false
 end
 
@@ -15,14 +15,15 @@ function cannonball:update()
     end
 end
 
-function cannonball:shoot(x,y)
+function cannonball:shoot(x,y, direction)
     self.active = true
     self.x = x
     self.y = y
+    self.direction = direction
 end
 
-function cannonball:draw()
+function cannonball:draw(cameraX, cameraY)
     if(self.active) then
-        self.super:draw()
+        cannonball.super.draw(self, cameraX, cameraY)
     end
 end
