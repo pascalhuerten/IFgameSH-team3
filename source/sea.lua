@@ -46,7 +46,7 @@ function sea:init()
     end
 end
 
-function sea:update(cameraX, cameraY)
+function sea:update()
     local frameDuration = 140 -- 140ms per frame
     local screenWidth, screenHeight = playdate.display.getSize()
     for _, waveSprite in ipairs(self.waves) do

@@ -57,3 +57,6 @@ function xyToDegrees(x,y)
     local eul = (270+deg)%360;    -- folded to [0,360) domain
     return eul;
 end
+function isOnScreen(x, y, threshold)
+    return x >= 0 - threshold and x <= 400 + threshold and y >= 0 - threshold and y <= 240 + threshold
+end

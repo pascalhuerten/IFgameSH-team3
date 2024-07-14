@@ -18,8 +18,9 @@ local gfx <const> = playdate.graphics
 
 
 local sea = sea()
-local kraken = kraken(100, -200)
+local kraken = kraken(400, 200)
 local player = player()
+local camera = camera(player.ship.x, player.ship.y)
 local wind = wind(40, math.pi * 0.8)
 local hud = hud()
 local enemy = enemy(player.ship);
@@ -45,15 +46,18 @@ local function updateGame()
 	for i,v in pairs(objects) do
 		v:update()
 	end
+	player:update()
+	camera:update(player.ship.x, player.ship.y)
+	cameraX, cameraY = camera.x, camera.y
 	detectCollision()
 	kraken:update()
-	sea:update(player.camera.x, player.camera.y)
-	wind:update(player.camera.x, player.camera.y)
+	sea:update()
+	wind:update()
 	local cannonCount = 1
 	local sailCount = 5
 	hud:update({
-		cannonCount = cannonCount,
-		sailCount = sailCount
+		crewAtCannons = player.ship.crewAtCannons,
+		crewAtSail = player.ship.crewAtSail
 	})
 end
 
@@ -70,9 +74,9 @@ end
 local function drawGame()
 	gfx.clear() -- Clears the screen
 	for k,v in pairs(objects) do
-		v:draw(player.camera.x, player.camera.y)
+		v:draw()
 	end
-	kraken:draw(player.camera.x, player.camera.y)
+	kraken:draw()
 	gfx.sprite.update()
 	hud:draw()
 end

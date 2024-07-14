@@ -23,7 +23,6 @@ function object:init(x, y, width, height, direction, imagePath, enableRotation, 
     local image = loadImage(imagePath)
 
     if self.enableRotation then
-        print("generate rotation image table")
         self.imageTable = makeRotationImageTable(image, 72)
         self.sprite = createSpriteFromImage(self.imageTable:getImage(1))
     else
@@ -44,7 +43,7 @@ function object:rotate(rotationSpeed)
     end
 end
 
-function object:draw(cameraX, cameraY)
+function object:draw()
     -- Calculate the correct frame based on direction
     if self.enableRotation then
         local segments = self.imageTable:getLength() - 1 -- Assuming the last image is for 360 degrees, which is the same as 0 degrees
@@ -56,8 +55,18 @@ function object:draw(cameraX, cameraY)
         self:animate()
     end
     
-    self.sprite:moveTo(self.x - cameraX, self.y - cameraY)
+    local drawX = self.x - cameraX
+    local drawY = self.y - cameraY
+    self.sprite:moveTo(drawX, drawY)
+    
+    if isOnScreen(drawX, drawY, 200) then
+        self.sprite:setVisible(true)
+    else
+        self.sprite:setVisible(false)
+    end
+
 end
+    
 
 function object:animate()
     -- cycle through the imagetable at animationSpeed
@@ -75,4 +84,8 @@ function object:animate()
     end
     
     self.sprite:markDirty()
+end
+
+function object:destroy()
+    self.sprite:remove()
 end
