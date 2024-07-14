@@ -19,16 +19,12 @@ function ship:init(x, y, width, height, moveSpeed, direction, imagePath, enableR
 end
 
 function ship:update()
-    self.rotationSpeed = lerp(self.rotationSpeed, self.desiredRotationSpeed, 0.01)
-    self:rotate(self.desiredRotationSpeed)
-    self.rotationSpeed = lerp(self.rotationSpeed, self.rotationSpeed / 2, 0.01);
+    self:rotate(self.rotationSpeed)
+    self.rotationSpeed = lerp(self.rotationSpeed, self.desiredRotationSpeed, 0.01);
     local dirX,dirY = convertDegreesToXY(self.direction)
     self.dx = self.moveSpeed * dirX * 1/30;
     self.dy = self.moveSpeed * dirY * 1/30;
     if (not self.canMove) then
-        self.moveSpeed = lerp(self.moveSpeed, 0, 0.01)
-        self:move(self.dx,self.dy)
-    else
         self.moveSpeed = lerp(self.moveSpeed, self.desiredSpeed, 0.01)
         self:move(self.dx,self.dy)
     end
@@ -39,17 +35,25 @@ function ship:shoot()
 end
 
 function ship:setRotationSpeed(value)
-    self.desiredRotationSpeed = value
+    if(self.moveSpeed > 0) then
+        self.desiredRotationSpeed = lerp(self.rotationSpeed, value, self.moveSpeed/self.maxSpeed)
+    else
+        self.desiredRotationSpeed = value
+    end
 end
 
 function ship:switchCanMove()
     self.canMove = not (self.canMove);
     if (self.canMove) then
-        self.moveSpeed = self.maxSpeed;
+        self.desiredSpeed = self.maxSpeed;
     end
 end
 
 function ship:draw(cameraX, cameraY)
     ship.super.draw(self, cameraX, cameraY)
     self.cannonball:draw(cameraX, cameraY)
+end
+
+function ship:collide()
+
 end
