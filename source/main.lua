@@ -37,7 +37,6 @@ end
 
 loadGame()
 local function updateGame()
-	print(ipairs(objects))
 	for i,v in pairs(objects) do
 		v:update()
 	end

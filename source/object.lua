@@ -22,7 +22,6 @@ function object:init(x, y, width, height, direction, imagePath, enableRotation, 
     local image = loadImage(imagePath)
 
     if self.enableRotation then
-        print("generate rotation image table")
         self.imageTable = makeRotationImageTable(image, 72)
         self.sprite = createSpriteFromImage(self.imageTable:getImage(1))
     else

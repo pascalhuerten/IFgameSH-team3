@@ -29,7 +29,6 @@ function kraken:update()
     -- Spawn warnings if kraken is visible on screen
 
     if self.sprite:isVisible() and #self.tentacles + #self.warnings < 4 and self.lastSpawnTime >= self.spawnDelay then
-        print("Spawn warning")
         local minDistance = 60
         local x, y
         repeat

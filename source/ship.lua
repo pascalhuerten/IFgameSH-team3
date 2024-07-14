@@ -4,7 +4,6 @@ import "cannonball"
 class("ship").extends("object")
 
 function ship:init(x, y, width, height, moveSpeed, direction, imagePath, enableRotation, maxSpeed)
-    -- self.super = object(x, y, width, height, direction, imagePath, enableRotation)
     ship.super.init(self, x, y, width, height, direction, imagePath, enableRotation)
     self.desiredSpeed = moveSpeed;
     self.moveSpeed = 0;
