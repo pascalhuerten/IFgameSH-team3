@@ -50,8 +50,8 @@ local function updateGame()
 	local cannonCount = 1
 	local sailCount = 5
 	hud:update({
-		cannonCount = cannonCount,
-		sailCount = sailCount
+		crewAtCannons = player.ship.crewAtCannons,
+		crewAtSail = player.ship.crewAtSail
 	})
 end
 

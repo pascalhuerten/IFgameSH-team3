@@ -8,8 +8,8 @@ class("hud").extends()
 
 function hud:init()
 	self.hudElements = {}
-	table.insert(self.hudElements, hudElement(5, 200, "sailCount", config.sailIconPath))
-	table.insert(self.hudElements, hudElement(5, 220, "cannonCount", config.cannonIconPath))
+	table.insert(self.hudElements, hudElement(5, 200, "crewAtSail", config.sailIconPath))
+	table.insert(self.hudElements, hudElement(5, 220, "crewAtCannons", config.cannonIconPath))
 	table.insert(self.hudElements, hudElement(35, 200, nil, config.dPadVerticalIconPath))
 end
 

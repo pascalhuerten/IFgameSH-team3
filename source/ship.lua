@@ -3,10 +3,10 @@ import "cannonball"
 
 class("ship").extends("object")
 
-function ship:init(x, y, width, height, moveSpeed, direction, imagePath, enableRotation, maxSpeed)
+function ship:init(x, y, width, height, direction, imagePath, enableRotation, maxSpeed)
     ship.super.init(self, x, y, width, height, direction, imagePath, enableRotation)
-    self.desiredSpeed = moveSpeed;
     self.moveSpeed = 0;
+    self.desiredSpeed = 0;
     self.maxSpeed = maxSpeed;
     self.rotationSpeed = 0;
     self.desiredRotationSpeed = 0;
@@ -17,11 +17,18 @@ function ship:init(x, y, width, height, moveSpeed, direction, imagePath, enableR
     self.dx =0;
     self.dy = 0;
     self.activeCollision = true
-    self.hp = 100;
-    self.dyingCallback = function ();
+    self.totalCrew = 5
+    self.crewAtCannons = self.totalCrew // 2
+    self.crewAtSail = self.totalCrew - self.crewAtCannons
+    self.dyingCallback = function () end
 end
 
 function ship:update()
+    if (self.canMove) then
+        self.desiredSpeed = self.maxSpeed * self:getCrewAtSailFactor();
+    else
+        self.desiredSpeed = 0;
+    end
     self:rotate(self.rotationSpeed)
     local t = 0.25;
     if(math.abs(self.rotationSpeed)  >= math.abs(self.desiredRotationSpeed)) then
@@ -35,6 +42,7 @@ function ship:update()
     self.dy = self.moveSpeed * dirY * deltaTime;
     self:move(self.dx,self.dy)
 end
+
 function ship:shoot()
     self.cannonball:shoot(self.x, self.y, self.direction + 90, self.dx, self.dy)
 end
@@ -49,11 +57,6 @@ end
 
 function ship:switchCanMove()
     self.canMove = not (self.canMove);
-    if (self.canMove) then
-        self.desiredSpeed = self.maxSpeed;
-    else
-        self.desiredSpeed = 0;
-    end
 end
 
 function ship:draw()
@@ -69,9 +72,53 @@ function ship:collide(object)
     end
 end
 
-function ship:damage(dmg)
-    self.hp -= dmg;
-    if(self.hp <= 0) then
-        self.dyingCallback() end
+function ship:damage()
+    self.dropCrew()
+end
+
+function ship:getCrewAtSailFactor()
+    return self.crewAtSail / self.totalCrew
+end
+
+function ship:getCrewAtCannonsFactor()
+    return self.crewAtCannons / self.totalCrew
+end
+
+function ship:crewToSail()
+    if self.crewAtCannons > 0 then
+        self.crewAtSail = self.crewAtSail + 1
+        self.crewAtCannons = self.crewAtCannons - 1
+    end
+end
+
+function ship:crewToCannons()
+    if self.crewAtSail > 0 then
+        self.crewAtCannons = self.crewAtCannons + 1
+        self.crewAtSail = self.crewAtSail - 1
+    end
+end
+
+function ship:pickupCrew()
+    self.totalCrew = self.totalCrew + 1
+    -- Add crew to place where there is less crew
+    if self.crewAtSail < self.crewAtCannons then
+        self.crewAtSail = self.crewAtSail + 1
+    else
+        self.crewAtCannons = self.crewAtCannons + 1
+    end
+end
+
+function ship:dropCrew()
+    self.totalCrew = self.totalCrew - 1
+    
+    if(self.totalCrew <= 0) then
+        self.dyingCallback()
+    else
+    -- Remove crew from random place
+        if math.random(0, 1) == 0 then
+            self.crewAtSail = self.crewAtSail - 1
+        else
+            self.crewAtCannons = self.crewAtCannons - 1
+        end
     end
 end

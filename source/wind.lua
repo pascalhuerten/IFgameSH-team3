@@ -15,7 +15,7 @@ function wind:init(speed, direction)
     -- create wind sprites
     for i = 1, 5 do
         local windSprite = gfx.sprite.new()
-        windSprite:setSize(8, 4)
+        windSprite:setSize(11, 5)
         windSprite.originalX = math.random(0, screenWidth)
         windSprite.originalY = math.random(0, screenHeight)
         windSprite:moveTo(windSprite.x, windSprite.y)

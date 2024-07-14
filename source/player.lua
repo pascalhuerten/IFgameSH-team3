@@ -16,14 +16,20 @@ function player:init()
         end;
         BButtonDown = function ()
             self.ship:shoot()
-        end
+        end;
+        upButtonDown = function()
+            self.ship:crewToSail()
+        end;
+        downButtonDown = function()
+            self.ship:crewToCannons()
+        end;
     };
-    
-    self.ship = ship(200, 200, 74, 74, 40, 0, config.playerShipImagePath, true, 50)
+    self.ship = ship(200, 200, 74, 74, 0, config.playerShipImagePath, true, 50)
     playdate.inputHandlers.push(self.myInputHandlers)
 end
 
 function player:update()
+    
 end
 
 function player:draw()
