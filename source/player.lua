@@ -22,7 +22,7 @@ function player:init()
         end
     };
     
-    self.ship = ship(200, 200, 74, 74, 40, 0, config.playerShipImagePath, true, 50)
+    self.ship = ship(200, 200, 74, 40, 40, 0, config.playerShipImagePath, true, 50, 0)
     playdate.inputHandlers.push(self.myInputHandlers)
     self.camera = camera(self.ship.x, self.ship.y)
 end

@@ -3,23 +3,23 @@ import "cannonball"
 
 class("ship").extends("object")
 
-function ship:init(x, y, width, height, moveSpeed, direction, imagePath, enableRotation, maxSpeed)
+function ship:init(x, y, width, height, moveSpeed, direction, imagePath, enableRotation, maxSpeed, team)
     -- self.super = object(x, y, width, height, direction, imagePath, enableRotation)
     ship.super.init(self, x, y, width, height, direction, imagePath, enableRotation)
-    self.desiredSpeed = moveSpeed;
+    self.desiredSpeed = 0;
     self.moveSpeed = 0;
     self.maxSpeed = maxSpeed;
     self.rotationSpeed = 0;
     self.desiredRotationSpeed = 0;
     self.canMove = false;
     local cannonballDirection = 0
-    self.team = 0;
+    self.team = team;
     self.cannonball = cannonball(x, y, 4, 4, 60, cannonballDirection, config.cannonBallImagePath, false, self.team)
-    self.dx =0;
+    self.dx = 0;
     self.dy = 0;
     self.activeCollision = true
     self.hp = 100;
-    self.dyingCallback = function ();
+    self.dyingCallback = function () end
 end
 
 function ship:update()
@@ -37,7 +37,7 @@ function ship:update()
     self:move(self.dx,self.dy)
 end
 function ship:shoot()
-    self.cannonball:shoot(self.x, self.y, self.direction + 90, self.dx, self.dy)
+    self.cannonball:shoot(self.x + self.width/2, self.y + self.height/2, self.direction + 90, self.dx, self.dy)
 end
 
 function ship:setRotationSpeed(value)
@@ -63,15 +63,18 @@ end
 
 function ship:collide(object)
     if(object == self.cannonball) then return end
-    if(collides(self, object) and self.team ~= object.team and object.activeCollision) then
-        self:damage(object.collisionDamage)
-        self.activeCollision = false;
+    if(self.activeCollision and object.activeCollision and self.team ~= object.team and collides(self, object)) then
+        self:damage()
+        object:registerCollision()
+        --self.activeCollision = false;
     end
 end
 
-function ship:damage(dmg)
-    self.hp -= dmg;
-    if(self.hp <= 0) then
-        self.dyingCallback() end
-    end
+function ship:registerCollision()
+    self:damage()
+    --self.activeCollision = false;
+end
+
+function ship:damage()
+    print("damage")
 end

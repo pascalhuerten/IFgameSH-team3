@@ -12,6 +12,7 @@ import "sea"
 import "wind"
 import "hud" -- DEMO
 import "cannonball"
+import "enemy"
 
 local gfx <const> = playdate.graphics
 
@@ -21,10 +22,13 @@ local kraken = kraken(100, -200)
 local player = player()
 local wind = wind(40, math.pi * 0.8)
 local hud = hud()
+local enemy = enemy(player.ship);
 
 local objects = {
 	one = player.ship;
 	two = player.ship.cannonball,
+	three = enemy.ship;
+	four = enemy.ship.cannonball
 	-- something else
 }
 
@@ -36,8 +40,8 @@ end
 
 loadGame()
 local function updateGame()
-	print(ipairs(objects))
 	player:update()
+	enemy:update()
 	for i,v in pairs(objects) do
 		v:update()
 	end
@@ -54,10 +58,10 @@ local function updateGame()
 end
 
 function detectCollision()
-	for i1,v1 in ipairs(objects) do
-		for i2,v2 in ipairs(objects) do
+	for i1,v1 in pairs(objects) do
+		for i2,v2 in pairs(objects) do
 			if(v1 ~= v2) then
-				v1:collide(objects.v2)
+				v1:collide(v2)
 			end
 		end
 	end

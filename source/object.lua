@@ -11,7 +11,8 @@ function object:init(x, y, width, height, direction, imagePath, enableRotation, 
     self.currentFrame = 1
     self.frameCount = 1
     self.enableRotation = enableRotation
-
+    self.width = width
+    self.height = height
     if isGif(imagePath) then
         self.imageTable = gfx.imagetable.new(imagePath)
         self.sprite = createSpriteFromImage(self.imageTable:getImage(self.currentFrame))
@@ -28,6 +29,7 @@ function object:init(x, y, width, height, direction, imagePath, enableRotation, 
     else
         self.sprite = createSpriteFromImage(image)
     end
+    self.sprite:setCenter(0,0.25)
 end
 
 function object:move(dx,dy)

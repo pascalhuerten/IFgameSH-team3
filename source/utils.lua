@@ -49,3 +49,11 @@ function createSpriteFromImage(image)
     sprite:add()
     return sprite
 end
+
+function xyToDegrees(x,y) 
+    local rad = math.atan(y/x);   -- arcus tangent in radians
+    local deg = rad*180/math.pi;  -- converted to degrees
+    if (x<0) then deg += 180 end  --    // fixed mirrored angle of arctan
+    local eul = (270+deg)%360;    -- folded to [0,360) domain
+    return eul;
+end
