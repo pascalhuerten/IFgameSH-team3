@@ -24,6 +24,7 @@ function cannonball:shoot(x,y,direction, dx,dy)
     self.dirX, self.dirY = convertDegreesToXY(direction)
     self.dx = dx;
     self.dy = dy;
+    soundController:playCannonShot()
 end
 
 function cannonball:draw()
@@ -43,4 +44,5 @@ end
 function cannonball:registerCollision()
     self.active = false
     self.sprite:remove()
+    soundController:playCannonHit()
 end
