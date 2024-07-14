@@ -3,7 +3,7 @@ class("enemy").extends()
 local distanceToStop = 0
 
 function enemy:init(player)
-    self.ship = ship(player.x + 100, player.y + 100, 74, 40, 40, config.playerShipImagePath, true, 50, 1)
+    self.ship = ship(player.x + 100, player.y + 100, 74, 40, 40, config.enemyShipImagePath, true, 50, 1, 2)
     self.target = player
 end
 

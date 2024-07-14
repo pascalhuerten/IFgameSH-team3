@@ -16,7 +16,7 @@ function kraken:update()
     -- Update warnings and spawn tentacles
     for i = #self.warnings, 1, -1 do
         local warning = self.warnings[i]
-        warning:update(deltaTime)
+        warning:update()
         if warning:isExpired() then
             -- Replace warning with tentacle
             table.insert(self.tentacles, tentacle(warning.x, warning.y, warning.direction))
@@ -77,10 +77,6 @@ function tentacle:init(x, y, direction)
     tentacle.super.init(self, x, y, 40, 40, direction, config.tentacleImagePath, false, 140)
     self.sprite:setZIndex(-10)
     self.timer = 0
-end
-
-function tentacle:update()
-    self.timer = self.timer + deltaTime
 end
 
 function tentacle:isExpired()

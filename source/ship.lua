@@ -3,7 +3,7 @@ import "cannonball"
 
 class("ship").extends("object")
 
-function ship:init(x, y, width, height, direction, imagePath, enableRotation, maxSpeed, team)
+function ship:init(x, y, width, height, direction, imagePath, enableRotation, maxSpeed, team, totalCrew)
     ship.super.init(self, x, y, width, height, direction, imagePath, enableRotation)
     self.moveSpeed = 0;
     self.desiredSpeed = 0;
@@ -16,10 +16,9 @@ function ship:init(x, y, width, height, direction, imagePath, enableRotation, ma
     self.dx = 0;
     self.dy = 0;
     self.activeCollision = true
-    self.totalCrew = 5
-    self.crewAtCannons = self.totalCrew // 2
-    self.crewAtSail = self.totalCrew - self.crewAtCannons
-    self.dyingCallback = function () end
+    self.totalCrew = totalCrew
+    self.crewAtCannons = self.totalCrew;
+    self.crewAtSail = 0;
     self.collideTimer = 0;
     self.collideTime = 2;
     self.shootTimerR = 0;
@@ -115,7 +114,12 @@ function ship:registerCollision()
     self.activeCollision = false;
 end
 function ship:damage()
+    screenShake(500, 5)
     self:dropCrew()
+    
+    if(self.totalCrew <= 0) then
+        self:destroy()
+    end
 end
 
 function ship:getCrewAtSailFactor()
@@ -153,16 +157,22 @@ function ship:pickupCrew()
 end
 
 function ship:dropCrew()
-    self.totalCrew = self.totalCrew - 1
-    
-    if(self.totalCrew <= 0) then
-        self.dyingCallback()
+        -- Check if there is crew to remove
+    if self.crewAtSail == 0 and self.crewAtCannons == 0 then
+        return
+    elseif self.crewAtSail == 0 then
+        self.crewAtCannons = self.crewAtCannons - 1
+    elseif self.crewAtCannons == 0 then
+        self.crewAtSail = self.crewAtSail - 1
     else
-    -- Remove crew from random place
+-- Remove crew from random place
         if math.random(0, 1) == 0 then
             self.crewAtSail = self.crewAtSail - 1
         else
             self.crewAtCannons = self.crewAtCannons - 1
         end
+    end
+    if self.totalCrew > 0 then
+        self.totalCrew = self.totalCrew - 1
     end
 end
