@@ -12,10 +12,10 @@ function player:init()
             self.ship:setRotationSpeed(min * 3);
         end;
         AButtonDown = function()
-            self.ship:switchCanMove();
+            self.ship:shootRight()
         end;
         BButtonDown = function ()
-            self.ship:shoot()
+            self.ship:shootLeft()
         end;
         upButtonDown = function()
             self.ship:crewToSail()

@@ -10,10 +10,9 @@ function ship:init(x, y, width, height, direction, imagePath, enableRotation, ma
     self.maxSpeed = maxSpeed;
     self.rotationSpeed = 0;
     self.desiredRotationSpeed = 0;
-    self.canMove = false;
-    local cannonballDirection = 0
     self.team = team;
-    self.cannonball = cannonball(x, y, 4, 4, 60, cannonballDirection, config.cannonBallImagePath, false, self.team)
+    self.cannonballright = cannonball(x, y, 4, 4, 60, 0, config.cannonBallImagePath, false, self.team)
+    self.cannonballleft = cannonball(x, y, 4, 4, 60, 0, config.cannonBallImagePath, false, self.team)
     self.dx = 0;
     self.dy = 0;
     self.activeCollision = true
@@ -23,8 +22,10 @@ function ship:init(x, y, width, height, direction, imagePath, enableRotation, ma
     self.dyingCallback = function () end
     self.collideTimer = 0;
     self.collideTime = 2;
-    self.shootTimer = 0;
-    self.canShoot = true;
+    self.shootTimerR = 0;
+    self.shootTimerL = 0;
+    self.canShootRight = true;
+    self.canShootLeft = true;
     self.maxReloadTime = 3.0
 end
 
@@ -33,7 +34,6 @@ function ship:getTimeToShoot()
 end
 
 function ship:update()
-    print(self:getTimeToShoot())
     if(not self.activeCollision) then
         self.collideTimer += deltaTime;
         if(self.collideTimer >= self.collideTime) then
@@ -41,17 +41,19 @@ function ship:update()
             self.activeCollision = true
         end
     end
-    if(not self.canShoot) then
-        self.shootTimer += deltaTime;
-        if(self.shootTimer >= self:getTimeToShoot()) then
-            self.shootTimer = 0;
-            self.canShoot = true
+    if(not self.canShootRight) then
+        self.shootTimerR += deltaTime;
+        if(self.shootTimerR >= self:getTimeToShoot()) then
+            self.shootTimerR = 0;
+            self.canShootRight = true
         end
     end
-    if (self.canMove) then
-        self.desiredSpeed = self.maxSpeed * self:getCrewAtSailFactor();
-    else
-        self.desiredSpeed = 0;
+    if(not self.canShootLeft) then
+        self.shootTimerL += deltaTime;
+        if(self.shootTimerL >= self:getTimeToShoot()) then
+            self.shootTimerL = 0;
+            self.canShootLeft = true
+        end
     end
     self:rotate(self.rotationSpeed)
     local t = 0.25;
@@ -67,35 +69,43 @@ function ship:update()
     self:move(self.dx,self.dy)
 end
 
-function ship:shoot()
-    if(self.canShoot)then
+function ship:shootRight()
+    if(self.canShootRight)then
+        print("shotright")
         if(self:getCrewAtCannonsFactor() == 0) then
             return
         end
-        self.canShoot = false
-        self.cannonball:shoot(self.x + self.width/2, self.y + self.height/2, self.direction + 90, self.dx, self.dy)
+        self.canShootRight = false
+        self.cannonballright:shoot(self.x + self.width/2, self.y + self.height/2, self.direction + 90, self.dx, self.dy)
+    end
+end
+function ship:shootLeft()
+    print("shotleft")
+    if(self.canShootLeft)then
+        if(self:getCrewAtCannonsFactor() == 0) then
+            return
+        end
+        self.canShootLeft = false
+        self.cannonballleft:shoot(self.x + self.width/2, self.y + self.height/2, self.direction - 90, self.dx, self.dy)
     end
 end
 
 function ship:setRotationSpeed(value)
-    if(self.canMove) then
+    if(self:getCrewAtSailFactor() ~= 0) then
         self.desiredRotationSpeed = value
     else
         self.desiredRotationSpeed = lerp(0, value, self.moveSpeed/self.maxSpeed)
     end
 end
 
-function ship:switchCanMove()
-    self.canMove = not (self.canMove);
-end
-
 function ship:draw()
     ship.super.draw(self)
-    self.cannonball:draw()
+    self.cannonballright:draw(cameraX,cameraY)
+    self.cannonballright:draw(cameraX,cameraY)
 end
 
 function ship:collide(object)
-    if(object == self.cannonball) then return end
+    if(object == self.cannonballleft or object == self.cannonballright) then return end
     if(self.activeCollision and object.activeCollision and self.team ~= object.team and collides(self, object)) then
         self:registerCollision()
         object:registerCollision()
@@ -122,6 +132,7 @@ function ship:crewToSail()
     if self.crewAtCannons > 0 then
         self.crewAtSail = self.crewAtSail + 1
         self.crewAtCannons = self.crewAtCannons - 1
+        self.desiredSpeed = self.maxSpeed * self:getCrewAtSailFactor()
     end
 end
 
@@ -129,6 +140,7 @@ function ship:crewToCannons()
     if self.crewAtSail > 0 then
         self.crewAtCannons = self.crewAtCannons + 1
         self.crewAtSail = self.crewAtSail - 1
+        self.desiredSpeed = self.maxSpeed * self:getCrewAtSailFactor()
     end
 end
 

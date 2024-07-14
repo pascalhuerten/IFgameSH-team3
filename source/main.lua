@@ -29,9 +29,11 @@ soundController = SoundController()
 
 local objects = {
 	one = player.ship;
-	two = player.ship.cannonball,
-	three = enemy.ship;
-	four = enemy.ship.cannonball
+	two = player.ship.cannonballright,
+	three = player.ship.cannonballleft,
+	four = enemy.ship;
+	five = enemy.ship.cannonballleft,
+	six = enemy.ship.cannonballright,
 	-- something else
 }
 
