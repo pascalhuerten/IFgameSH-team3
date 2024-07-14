@@ -2,30 +2,32 @@ local gfx <const> = playdate.graphics
 
 class("object").extends()
 
-function object:init(x, y, width, height, direction, imagePath, enableRotation)
+function object:init(x, y, width, height, direction, imagePath, enableRotation, animationSpeed)
     self.x = x
     self.y = y
     self.direction = direction
-    
-    local image = gfx.image.new(imagePath)
-    if image == nil then
-        error("no image found")
+    self.animationSpeed = animationSpeed or 0
+    self.animationTimer = 0
+    self.currentFrame = 1
+    self.frameCount = 1
+    self.enableRotation = enableRotation
+
+    if isGif(imagePath) then
+        self.imageTable = gfx.imagetable.new(imagePath)
+        self.sprite = createSpriteFromImage(self.imageTable:getImage(self.currentFrame))
+        self.frameCount = self.imageTable:getLength()
+        return
     end
-    
-    -- Check if rotation is enabled and generate imagetable
-    if enableRotation then
+
+    local image = loadImage(imagePath)
+
+    if self.enableRotation then
+        print("generate rotation image table")
         self.imageTable = makeRotationImageTable(image, 72)
-        image = self.imageTable:getImage(1)
-        self.sprite = gfx.sprite.new(image)
+        self.sprite = createSpriteFromImage(self.imageTable:getImage(1))
     else
-        self.sprite = gfx.sprite.new(image)
+        self.sprite = createSpriteFromImage(image)
     end
-    
-    if self.sprite == nil then
-        error("no image found")
-    end
-    self.sprite:setSize(image:getSize())
-    self.sprite:add()
 end
 
 function object:move(dx,dy)
@@ -42,11 +44,33 @@ end
 
 function object:draw(cameraX, cameraY)
     -- Calculate the correct frame based on direction
-    if self.imageTable then
+    if self.enableRotation then
         local segments = self.imageTable:getLength() - 1 -- Assuming the last image is for 360 degrees, which is the same as 0 degrees
         local frameIndex = math.floor(((self.direction % 360) / 360) * segments) + 1
         self.sprite:setImage(self.imageTable:getImage(frameIndex))
     end
+
+    if self.animationSpeed > 0 then
+        self:animate()
+    end
     
     self.sprite:moveTo(self.x - cameraX, self.y - cameraY)
+end
+
+function object:animate()
+    -- cycle through the imagetable at animationSpeed
+    -- Update the animationTimer with the elapsed time
+    self.animationTimer = self.animationTimer + (deltaTime * 1000) -- Ensure deltaTime is correctly accumulated
+
+    -- Check if 140ms have passed
+    if self.animationTimer >= self.animationSpeed then
+        -- Update animation frame
+        self.currentFrame = (self.currentFrame % self.frameCount) + 1
+        self.sprite:setImage(self.imageTable:getImage(self.currentFrame))
+
+        -- Reset the animationTimer, accounting for overflow
+        self.animationTimer = self.animationTimer - self.animationSpeed -- Carry over any extra time beyond 140ms
+    end
+    
+    self.sprite:markDirty()
 end

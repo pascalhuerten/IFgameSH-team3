@@ -7,6 +7,7 @@ import "ship"
 import "camera"
 import "sea"
 import "player"
+import "kraken"
 import "sea"
 import "wind"
 import "hud" -- DEMO
@@ -16,6 +17,7 @@ local gfx <const> = playdate.graphics
 
 
 local sea = sea()
+local kraken = kraken(100, -200)
 local player = player()
 local wind = wind(40, math.pi * 0.8)
 local hud = hud()
@@ -40,6 +42,7 @@ local function updateGame()
 		v:update()
 	end
 	detectCollision()
+	kraken:update()
 	sea:update(player.camera.x, player.camera.y)
 	wind:update(player.camera.x, player.camera.y)
 	local cannonCount = 1
@@ -65,6 +68,7 @@ local function drawGame()
 	for k,v in pairs(objects) do
 		v:draw(player.camera.x, player.camera.y)
 	end
+	kraken:draw(player.camera.x, player.camera.y)
 	gfx.sprite.update()
 	hud:draw()
 end
