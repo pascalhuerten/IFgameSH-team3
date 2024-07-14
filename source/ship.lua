@@ -3,7 +3,7 @@ import "cannonball"
 
 class("ship").extends("object")
 
-function ship:init(x, y, width, height, direction, imagePath, enableRotation, maxSpeed)
+function ship:init(x, y, width, height, direction, imagePath, enableRotation, maxSpeed, team)
     ship.super.init(self, x, y, width, height, direction, imagePath, enableRotation)
     self.moveSpeed = 0;
     self.desiredSpeed = 0;
@@ -21,9 +21,33 @@ function ship:init(x, y, width, height, direction, imagePath, enableRotation, ma
     self.crewAtCannons = self.totalCrew // 2
     self.crewAtSail = self.totalCrew - self.crewAtCannons
     self.dyingCallback = function () end
+    self.collideTimer = 0;
+    self.collideTime = 2;
+    self.shootTimer = 0;
+    self.canShoot = true;
+    self.maxReloadTime = 5.0
+end
+
+function ship:getTimeToShoot()
+    return 1 + self.maxReloadTime * (1 - self:getCrewAtCannonsFactor())
 end
 
 function ship:update()
+    print(self:getTimeToShoot())
+    if(not self.activeCollision) then
+        self.collideTimer += deltaTime;
+        if(self.collideTimer >= self.collideTime) then
+            self.collideTimer = 0;
+            self.activeCollision = true
+        end
+    end
+    if(not self.canShoot) then
+        self.shootTimer += deltaTime;
+        if(self.shootTimer >= self:getTimeToShoot()) then
+            self.shootTimer = 0;
+            self.canShoot = true
+        end
+    end
     if (self.canMove) then
         self.desiredSpeed = self.maxSpeed * self:getCrewAtSailFactor();
     else
@@ -44,7 +68,10 @@ function ship:update()
 end
 
 function ship:shoot()
-    self.cannonball:shoot(self.x + self.width/2, self.y + self.height/2, self.direction + 90, self.dx, self.dy)
+    if(self.canShoot)then
+        self.canShoot = false
+        self.cannonball:shoot(self.x + self.width/2, self.y + self.height/2, self.direction + 90, self.dx, self.dy)
+    end
 end
 
 function ship:setRotationSpeed(value)
@@ -67,15 +94,14 @@ end
 function ship:collide(object)
     if(object == self.cannonball) then return end
     if(self.activeCollision and object.activeCollision and self.team ~= object.team and collides(self, object)) then
-        self:damage()
+        self:registerCollision()
         object:registerCollision()
-        --self.activeCollision = false;
     end
 end
 
 function ship:registerCollision()
     self:damage()
-    --self.activeCollision = false;
+    self.activeCollision = false;
 end
 function ship:damage()
     self:dropCrew()

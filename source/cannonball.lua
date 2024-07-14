@@ -5,7 +5,6 @@ function cannonball:init(x, y, width, height, moveSpeed, direction, imagePath, e
     self.moveSpeed = moveSpeed
     cannonball.super.init(self, x, y, width, height, direction, config.cannonBallImagePath, enableRotation)
     self.active = false
-    self.activeCollision = true
     self.team = team;
 end
 
@@ -19,7 +18,6 @@ end
 
 function cannonball:shoot(x,y,direction, dx,dy)
     self.active = true
-    self.activeCollision = true
     self.sprite:add()
     self.x = x
     self.y = y
@@ -35,7 +33,7 @@ function cannonball:draw()
 end
 
 function cannonball:collide(object)
-    if(self.activeCollision and object.activeCollision and self.team ~= object.team and collides(self, object)) then
+    if(object.activeCollision and self.team ~= object.team and collides(self, object)) then
         self:registerCollision()
         object:registerCollision()
     end
@@ -44,7 +42,5 @@ end
 
 function cannonball:registerCollision()
     self.active = false
-    self.activeCollision = false;
     self.sprite:remove()
-    print("damage")
 end
