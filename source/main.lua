@@ -28,14 +28,16 @@ local enemy = enemy(player.ship);
 soundController = SoundController()
 
 local objects = {
-	one = player.ship;
-	two = player.ship.cannonballright,
-	three = player.ship.cannonballleft,
-	four = enemy.ship;
-	five = enemy.ship.cannonballleft,
-	six = enemy.ship.cannonballright,
-	-- something else
 }
+
+function registerObject(object)
+	key = tostring(#object)
+	objects[key] = object
+end
+
+function destroyObject(key)
+	table.remove(objects,key)
+end
 
 local function loadGame()
 	playdate.display.setRefreshRate(50) -- Sets framerate to 50 fps
