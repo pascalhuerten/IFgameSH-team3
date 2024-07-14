@@ -5,9 +5,6 @@ import "collision"
 class("player").extends()
 import "config"
 
-local gfx <const> = playdate.graphics
-local geom <const> = playdate.geometry
-
 function player:init()
     self.myInputHandlers = {
         cranked = function (change, acceleratedChange)
@@ -24,14 +21,11 @@ function player:init()
     
     self.ship = ship(200, 200, 74, 74, 40, 0, config.playerShipImagePath, true, 50)
     playdate.inputHandlers.push(self.myInputHandlers)
-    self.camera = camera(self.ship.x, self.ship.y)
 end
 
 function player:update()
-    self.camera:update(self.ship.x, self.ship.y)
 end
 
 function player:draw()
-    -- Draw the waves relative to the camera position
-    self.ship:draw(self.camera.x, self.camera.y)
+    self.ship:draw()
 end

@@ -57,8 +57,9 @@ function ship:switchCanMove()
     end
 end
 
-function ship:draw(cameraX, cameraY)
-    ship.super.draw(self, cameraX, cameraY)
+function ship:draw()
+    ship.super.draw(self)
+    self.cannonball:draw()
 end
 
 function ship:collide(object)

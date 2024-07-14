@@ -49,3 +49,7 @@ function createSpriteFromImage(image)
     sprite:add()
     return sprite
 end
+
+function isOnScreen(x, y, threshold)
+    return x >= 0 - threshold and x <= 400 + threshold and y >= 0 - threshold and y <= 240 + threshold
+end

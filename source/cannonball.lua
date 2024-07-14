@@ -29,9 +29,9 @@ function cannonball:shoot(x,y,direction, dx,dy)
     self.dy = dy;
 end
 
-function cannonball:draw(cameraX, cameraY)
+function cannonball:draw()
     if(self.active) then
-        cannonball.super.draw(self, cameraX, cameraY)
+        cannonball.super.draw(self)
     end
 end
 

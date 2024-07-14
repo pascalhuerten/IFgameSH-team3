@@ -28,7 +28,7 @@ function wind:init(speed, direction)
     end
 end
 
-function wind:update(cameraX, cameraY)
+function wind:update()
     local frameDuration = 200 -- 140ms per frame
     local screenWidth, screenHeight = playdate.display.getSize()
     for _, windSprite in ipairs(self.sprites) do
