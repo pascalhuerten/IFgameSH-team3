@@ -34,7 +34,7 @@ function object:move(dx,dy)
 end
 
 function object:rotate(rotationSpeed)
-    self.direction += rotationSpeed * 1/30;
+    self.direction += rotationSpeed * deltaTime;
     if(self.direction >= 360) then
         self.direction = math.fmod(self.direction, 360)
     end

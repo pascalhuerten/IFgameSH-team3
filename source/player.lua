@@ -12,7 +12,7 @@ function player:init()
     self.myInputHandlers = {
         cranked = function (change, acceleratedChange)
             local min = math.min(acceleratedChange, 60)
-            self.ship:setRotationSpeed(min * 2);
+            self.ship:setRotationSpeed(min * 3);
         end;
         AButtonDown = function()
             self.ship:switchCanMove();
@@ -28,7 +28,6 @@ function player:init()
 end
 
 function player:update()
-    self.ship:update()
     self.camera:update(self.ship.x, self.ship.y)
 end
 

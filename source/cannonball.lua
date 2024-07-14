@@ -1,12 +1,15 @@
 class("cannonball").extends("object")
 
 
-function cannonball:init(x, y, width, height, moveSpeed, direction, imagePath, enableRotation)
+function cannonball:init(x, y, width, height, moveSpeed, direction, imagePath, enableRotation, team)
     print(config.cannonBallImagePath)
     self.moveSpeed = moveSpeed
     -- self.super = object(x, y, width, height, direction, config.cannonBallImagePath, enableRotation)
     cannonball.super.init(self, x, y, width, height, direction, config.cannonBallImagePath, enableRotation)
     self.active = false
+    self.activeCollision = true
+    self.collisionDamage = 10;
+    self.team = team;
 end
 
 function cannonball:update()
@@ -30,4 +33,8 @@ function cannonball:draw(cameraX, cameraY)
     if(self.active) then
         cannonball.super.draw(self, cameraX, cameraY)
     end
+end
+
+function cannonball:collide(object)
+    -- animation?
 end

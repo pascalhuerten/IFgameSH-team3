@@ -21,8 +21,8 @@ local wind = wind(40, math.pi * 0.8)
 local hud = hud()
 
 local objects = {
-	player.ship,
-	player.ship.cannonball,
+	one = player.ship;
+	two = player.ship.cannonball,
 	-- something else
 }
 
@@ -33,9 +33,13 @@ local function loadGame()
 end
 
 loadGame()
-
 local function updateGame()
+	print(ipairs(objects))
 	player:update()
+	for i,v in pairs(objects) do
+		v:update()
+	end
+	detectCollision()
 	sea:update(player.camera.x, player.camera.y)
 	wind:update(player.camera.x, player.camera.y)
 	local cannonCount = 1
@@ -46,9 +50,21 @@ local function updateGame()
 	})
 end
 
+function detectCollision()
+	for i1,v1 in ipairs(objects) do
+		for i2,v2 in ipairs(objects) do
+			if(v1 ~= v2) then
+				v1:collide(objects.v2)
+			end
+		end
+	end
+end
+
 local function drawGame()
 	gfx.clear() -- Clears the screen
-	player:draw()
+	for k,v in pairs(objects) do
+		v:draw(player.camera.x, player.camera.y)
+	end
 	gfx.sprite.update()
 	hud:draw()
 end

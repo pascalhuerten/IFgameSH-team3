@@ -13,32 +13,38 @@ function ship:init(x, y, width, height, moveSpeed, direction, imagePath, enableR
     self.desiredRotationSpeed = 0;
     self.canMove = false;
     local cannonballDirection = 0
-    self.cannonball = cannonball(x, y, 4, 4, 60, cannonballDirection, config.cannonBallImagePath, false)
+    self.team = 0;
+    self.cannonball = cannonball(x, y, 4, 4, 60, cannonballDirection, config.cannonBallImagePath, false, self.team)
     self.dx =0;
     self.dy = 0;
+    self.activeCollision = true
+    self.hp = 100;
+    self.dyingCallback = function ();
 end
 
 function ship:update()
     self:rotate(self.rotationSpeed)
-    self.rotationSpeed = lerp(self.rotationSpeed, self.desiredRotationSpeed, 0.01);
-    local dirX,dirY = convertDegreesToXY(self.direction)
-    self.dx = self.moveSpeed * dirX * 1/30;
-    self.dy = self.moveSpeed * dirY * 1/30;
-    if (not self.canMove) then
-        self.moveSpeed = lerp(self.moveSpeed, self.desiredSpeed, 0.01)
-        self:move(self.dx,self.dy)
+    local t = 0.25;
+    if(math.abs(self.rotationSpeed)  >= math.abs(self.desiredRotationSpeed)) then
+        t = 0.01
     end
-    self.cannonball:update()
+    self.rotationSpeed = lerp(self.rotationSpeed, self.desiredRotationSpeed, t);
+    local dirX,dirY = convertDegreesToXY(self.direction)
+
+    self.moveSpeed = lerp(self.moveSpeed, self.desiredSpeed, 0.01)
+    self.dx = self.moveSpeed * dirX * deltaTime;
+    self.dy = self.moveSpeed * dirY * deltaTime;
+    self:move(self.dx,self.dy)
 end
 function ship:shoot()
     self.cannonball:shoot(self.x, self.y, self.direction + 90, self.dx, self.dy)
 end
 
 function ship:setRotationSpeed(value)
-    if(self.moveSpeed > 0) then
-        self.desiredRotationSpeed = lerp(self.rotationSpeed, value, self.moveSpeed/self.maxSpeed)
-    else
+    if(self.canMove) then
         self.desiredRotationSpeed = value
+    else
+        self.desiredRotationSpeed = lerp(0, value, self.moveSpeed/self.maxSpeed)
     end
 end
 
@@ -46,14 +52,26 @@ function ship:switchCanMove()
     self.canMove = not (self.canMove);
     if (self.canMove) then
         self.desiredSpeed = self.maxSpeed;
+    else
+        self.desiredSpeed = 0;
     end
 end
 
 function ship:draw(cameraX, cameraY)
     ship.super.draw(self, cameraX, cameraY)
-    self.cannonball:draw(cameraX, cameraY)
 end
 
-function ship:collide()
+function ship:collide(object)
+    if(object == self.cannonball) then return end
+    if(collides(self, object) and self.team ~= object.team and object.activeCollision) then
+        self:damage(object.collisionDamage)
+        self.activeCollision = false;
+    end
+end
 
+function ship:damage(dmg)
+    self.hp -= dmg;
+    if(self.hp <= 0) then
+        self.dyingCallback() end
+    end
 end
