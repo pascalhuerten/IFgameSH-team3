@@ -3,6 +3,7 @@ local gfx <const> = playdate.graphics
 class("object").extends()
 
 function object:init(params)
+    print(params)
     self.x = params.x;
     self.y = params.y;
     self.direction = params.direction;

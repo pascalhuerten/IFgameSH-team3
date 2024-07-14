@@ -2,7 +2,7 @@ class("cannonball").extends("object")
 
 function cannonball:init(params)
     params.imagePath = "Resource/cannonball.png";
-    self.super:init(params)
+    cannonball.super.init(self,params)
     self.speed = params.speed
     self.direction = direction
     self.active = false
