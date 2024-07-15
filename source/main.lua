@@ -41,7 +41,7 @@ local player = player()
 local camera = camera(player.ship.x, player.ship.y)
 local wind = wind(40, math.pi * 0.8)
 local hud = hud()
---local enemy = enemy(player.ship);
+local enemy = enemy(player.ship);
 soundController = SoundController()
 
 
@@ -63,8 +63,10 @@ print(#objects)
 local function updateGame()
 	playdate.timer.updateTimers()
 	enemy:update()
-	for i, v in pairs(objects) do		
-		v:update()
+	for i, v in pairs(objects) do
+		if(v.active) then
+			v:update()
+		end
 	end
 	camera:update(player.ship.x, player.ship.y)
 	cameraX, cameraY = camera.x, camera.y
@@ -88,11 +90,15 @@ end
 
 function detectCollision()
 	for i1, v1 in pairs(objects) do
+		if(not v1.active) then goto continue1 end
 		for i2, v2 in pairs(objects) do
+			if(not v2.active) then goto continue2 end
 			if (v1 ~= v2) then
 				v1:collide(v2)
 			end
+			::continue2::
 		end
+		::continue1::
 	end
 end
 
@@ -107,7 +113,9 @@ local function drawGame()
 		return
 	end
 	for k, v in pairs(objects) do
-		v:draw()
+		if(v.active)then
+			v:draw()
+		end
 	end
 	kraken:draw()
 	gfx.sprite.update()

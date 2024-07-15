@@ -88,7 +88,6 @@ function ship:shootLeft()
 end
 
 function ship:setRotationSpeed(value)
-    print(value)
     if(self:getCrewAtSailFactor() ~= 0) then
         self.desiredRotationSpeed = value
     else
@@ -117,9 +116,10 @@ end
 function ship:damage()
     screenShake(500, 5)
     self:dropCrew()
-    
     if(self.totalCrew <= 0) then
         self:destroy()
+        self.cannonballleft:destroy()
+        self.cannonballright:destroy()
     end
 end
 

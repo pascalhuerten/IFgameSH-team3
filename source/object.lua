@@ -30,6 +30,10 @@ function object:init(x, y, width, height, direction, imagePath, enableRotation, 
     end
     self.sprite:setCenter(0,0.25)
     self.key = registerObject(self)
+    self.active = true
+    self.onDestroyCallback = function ()
+        
+    end         
 end
 
 function object:move(dx,dy)
@@ -90,4 +94,5 @@ end
 function object:destroy()
     self.sprite:remove()
     destroyObject(self.key)
+    self.active = false
 end

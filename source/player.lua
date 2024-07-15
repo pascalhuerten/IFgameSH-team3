@@ -24,7 +24,7 @@ function player:init()
             self.ship:crewToCannons()
         end;
     };
-    self.ship = ship(200, 200, 74, 74, 0, config.playerShipImagePath, true, 50, 0, 5)
+    self.ship = ship(0, 0, 74, 74, 0, config.playerShipImagePath, true, 50, 0, 5)
     playdate.inputHandlers.push(self.myInputHandlers)
 end
 
