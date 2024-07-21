@@ -4,38 +4,31 @@ import "CoreLibs/object"
 import "utils"
 import "object"
 import "ship"
+import "drowner"
 import "camera"
 import "sea"
 import "player"
-import "kraken"
 import "sea"
 import "wind"
-import "hud" -- DEMO
+import "hud"
+import "Cannon"
 import "cannonball"
+import "kraken"
 import "enemy"
 import "SoundController"
+import "GameObjectManager"
 import "CoreLibs/timer"
 import "arrow"
 
+-- Global Scope
+GameObjectManager = GameObjectManager()
+
 screenWidth, screenHeight = playdate.display.getSize()
+soundController = SoundController()
 
-local objects = {}
-
-objects = {
-}
-function registerObject(object)
-	table.insert(objects,object)
-end
-
-function destroyObject(object)
-	for i,v in pairs(objects) do
-		if(v == object) then table.remove(objects, i); return end
-	end
-end
-
+-- Local scope
 local gfx <const> = playdate.graphics
 local font = gfx.font.new('font/Mini Sans 2X') -- DEMO
-
 
 local sea = sea()
 local kraken = kraken(math.random(-1000, 1000), math.random(-1000, 1000))
@@ -44,36 +37,28 @@ local camera = camera(player.ship.x, player.ship.y)
 local wind = wind(40, math.pi * 0.8)
 local hud = hud()
 local enemy = enemy(player.ship);
-soundController = SoundController()
 local arrow = arrow(enemy.ship, player.ship, kraken)
 
 local function loadGame()
 	playdate.display.setRefreshRate(50)           -- Sets framerate to 50 fps
 	math.randomseed(playdate.getSecondsSinceEpoch()) -- seed for math.random
-	-- gfx.setFont(font) -- DEMO
-
-	-- SoundController:playBattleSoundtrack()
-	-- SoundController:playCannonShot()
-	-- SoundController:playCannonHit()
 
 	soundController:playIdleSoundtrack()
 end
-
 loadGame()
 
 local function updateGame()
 	playdate.timer.updateTimers()
 	enemy:update()
-	for i, v in pairs(objects) do
-		if(v.active and v.update) then
-			v:update()
-		end
-	end
-	camera:update(player.ship.x + player.ship.width / 2, player.ship.y + player.ship.height / 2)
+	GameObjectManager:update()
+	camera:update(player.ship.x, player.ship.y)
 	cameraX, cameraY = camera.x, camera.y
-	detectCollision()
+
+	GameObjectManager:detectCollision()
+
 	sea:update()
 	wind:update()
+
 	hud:update({
 		crewAtCannons = player.ship.crewAtCannons,
 		crewAtSail = player.ship.crewAtSail
@@ -83,20 +68,6 @@ local function updateGame()
 		soundController:playBattleSoundtrack()
 	else
 		soundController:playIdleSoundtrack()
-	end
-end
-
-function detectCollision()
-	for i1, v1 in pairs(objects) do
-		if(not v1.active or not v1.collide) then goto continue1 end
-		for i2, v2 in pairs(objects) do
-			if(not v2.active or not v2.collide) then goto continue2 end
-			if (v1 ~= v2) then
-				v1:collide(v2)
-			end
-			::continue2::
-		end
-		::continue1::
 	end
 end
 
@@ -110,13 +81,14 @@ local function drawGame()
 		gfx.popContext()
 		return
 	end
-	for k, v in pairs(objects) do
-		if(v.active)then
-			v:draw()
-		end
-	end
-	kraken:draw()
+
+	-- Draw Sprites
+	GameObjectManager:draw()
 	gfx.sprite.update()
+
+	-- Draw other graphics
+	-- GameObjectManager:drawHealth()
+	-- GameObjectManager:drawCollisionBorder()
 	hud:draw()
 	arrow:draw()
 end

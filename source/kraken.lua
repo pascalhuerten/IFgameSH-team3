@@ -1,19 +1,28 @@
-local gfx <const> = playdate.graphics
+import "object"
 
 class("kraken").extends("object")
 
 function kraken:init(x, y)
-    kraken.super.init(self, x, y, 40, 40, 0, config.krakenImagePath, false, 140)
+    kraken.super.init(self, x, y, 0, 0, nil, 80, 80, config.krakenImagePath, false, 140, 1, 10, 1000, true, {{0, 0, 55}})
     self.tentacles = {}
     self.warnings = {}
     self.spawnDelay = 1.3 -- Delay in seconds between spawns
     self.lastSpawnTime = 0 -- Time since last spawn
-    self.team = 2
-    self.HP = 100;
-    self.sprite:setCenter(0,0)
 end
 
 function kraken:update()
+    if(self.health <= 0) then
+        for _, v in ipairs(self.tentacles) do
+            v:destroy()
+        end
+        for _, v in ipairs(self.warnings) do
+            v:destroy()
+        end
+        print("Kraken killed!")
+        self:destroy()
+        return
+    end
+
     self.lastSpawnTime = self.lastSpawnTime + deltaTime
 
     -- Update warnings and spawn tentacles
@@ -21,7 +30,7 @@ function kraken:update()
         local warning = self.warnings[i]
         if warning:isExpired() then
             -- Replace warning with tentacle
-            table.insert(self.tentacles, tentacle(warning.x, warning.y, warning.direction))
+            table.insert(self.tentacles, tentacle(warning.x, warning.y, warning.direction, self.team))
             self.warnings[i]:destroy()
             table.remove(self.warnings, i)
         end
@@ -46,7 +55,7 @@ function kraken:update()
         end
 
         -- Insert warning object
-        table.insert(self.warnings, warning(x, y, direction))
+        table.insert(self.warnings, warning(x, y, direction, self.team))
         self.lastSpawnTime = 0
     end
 
@@ -60,47 +69,22 @@ function kraken:update()
     end
 end
 
-function kraken:collide(object)
-    if(self.team == object.team) then return end
-    if((object.activeCollision == nil or object.activeCollision) and object.active and collides(self, object)) then 
-        object:registerCollision()
-        self:registerCollision()
+function kraken:onCollision(otherObject)
+    print("Kraken hit")
+    if otherObject.team == self.team then
+        print("Kraken hit by same team, no damage")
+        return
     end
-end
 
-function kraken:registerCollision()
-    self.HP -= 10;
-    if(self.HP <= 0) then
-        self:destroy()
-        for index, value in ipairs(self.tentacles) do
-            value:destroy()
-        end
-        for index, value in ipairs(self.warnings) do
-            value:destroy()
-        end
-    end
+    self:receiveDamage(otherObject.damageOutput)
 end
 
 
 class("tentacle").extends("object")
 
-function tentacle:init(x, y, direction)
-    tentacle.super.init(self, x, y, 40, 40, direction, config.tentacleImagePath, false, 140)
+function tentacle:init(x, y, direction, team)
+    tentacle.super.init(self, x, y, 0, 0, direction, 40, 40, config.tentacleImagePath, false, 140, team, 10, 10, true, {{0, 0, 20}})
     self.sprite:setZIndex(-10)
-    self.timer = 0
-    self.team = 2
-end
-
-function tentacle:collide(object)
-    if(self.team == object.team) then return end
-    if(object.enableCollision and object.active and collides(self, object)) then 
-        object:registerCollision()
-        self:registerCollision()
-    end
-end
-
-function tentacle:registerCollision()
-    print("tentacle collides!")
 end
 
 function tentacle:isExpired()
@@ -110,16 +94,15 @@ end
 class("warning").extends("object")
 
 function warning:init(x, y, direction)
-    warning.super.init(self, x, y, 20, 20, direction, config.tentacleWarningImagePath, false, 140)
+    warning.super.init(self, x, y, 0, 0, direction, 20, 20, config.tentacleWarningImagePath, false, 140, team, 0, 1000, true)
     self.sprite:setZIndex(-10)
-    self.expirationTime = 3
-    self.timer = 0
+    self.timer = playdate.timer.new(3000, function() self:expire() end)
 end
 
-function warning:update()
-    self.timer = self.timer + deltaTime
+function warning:expire()
+    self.expired = true
 end
 
 function warning:isExpired()
-    return self.timer >= self.expirationTime
+    return self.expired
 end

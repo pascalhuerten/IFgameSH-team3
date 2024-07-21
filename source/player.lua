@@ -1,15 +1,14 @@
 import "ship"
 import "camera"
 import "collision"
+import "config"
 
 class("player").extends()
-import "config"
 
 function player:init()
     self.myInputHandlers = {
-        cranked = function (change, acceleratedChange)
-            local min = math.min(acceleratedChange, 60)
-            self.ship:setRotationSpeed(min * 3);
+        cranked = function (_, acceleratedChange)
+            self.ship:setRotationSpeed(acceleratedChange);
         end;
         AButtonDown = function()
             self.ship:shootRight()
@@ -24,10 +23,6 @@ function player:init()
             self.ship:crewToCannons()
         end;
     };
-    self.ship = ship(0, 0, 74, 74, 0, config.playerShipImagePath, true, 50, 0, 5)
+    self.ship = playerShip(0, 0, 0, 74, 74, config.playerShipImagePath, 0, 20, 1000, 5)
     playdate.inputHandlers.push(self.myInputHandlers)
-end
-
-function player:draw()
-    self.ship:draw()
 end

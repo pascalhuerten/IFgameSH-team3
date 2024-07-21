@@ -4,6 +4,10 @@ function lerp(a, b, t)
     return a + (b - a) * t
 end
 
+function clamp(a, min, max)
+    return math.min(math.max(a, min), max)
+end
+
 function convertDegreesToXY(angleInDegrees)
     local radians = degreesToRadians(angleInDegrees)
     local x = math.cos(radians)
@@ -62,6 +66,7 @@ function xyToDegrees(x,y)
     end
     return deg;
 end
+
 function isOnScreen(x, y, threshold)
     return x >= 0 - threshold and x <= 400 + threshold and y >= 0 - threshold and y <= 240 + threshold
 end

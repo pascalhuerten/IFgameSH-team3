@@ -3,124 +3,103 @@ import "cannonball"
 
 class("ship").extends("object")
 
-function ship:init(x, y, width, height, direction, imagePath, enableRotation, maxSpeed, team, totalCrew)
-    ship.super.init(self, x, y, width, height, direction, imagePath, enableRotation)
-    self.moveSpeed = 0;
-    self.desiredSpeed = 0;
-    self.maxSpeed = maxSpeed;
-    self.rotationSpeed = 0;
-    self.desiredRotationSpeed = 0;
-    self.team = team;
-    self.cannonballright = cannonball(x, y, 4, 4, 60, 0, config.cannonBallImagePath, false, self.team)
-    self.cannonballleft = cannonball(x, y, 4, 4, 60, 0, config.cannonBallImagePath, false, self.team)
-    self.dx = 0;
-    self.dy = 0;
-    self.activeCollision = true
+function ship:init(x, y, direction, width, height, imagePath, team, damageOutput, health, totalCrew, maxSpeed, maxRotationSpeed)
+    ship.super.init(self, x, y, nil, nil, direction, width, height, imagePath, true, nil, team, damageOutput, health, true, {{-22, 0, 16}, {-4, 0, 16}, {14, 0, 10}})
+    self.maxSpeed = maxSpeed or 70
+    self.rotationSpeed = 0
+    self.maxRotationSpeed = maxRotationSpeed or 100
+    self.cannonballSpeed = 120
     self.totalCrew = totalCrew
     self.crewAtCannons = self.totalCrew;
     self.crewAtSail = 0;
-    self.collideTimer = 0;
-    self.collideTime = 2;
-    self.shootTimerR = 0;
-    self.shootTimerL = 0;
-    self.canShootRight = true;
-    self.canShootLeft = true;
-    self.maxReloadTime = 3.0
+    self.cannonsLeft, self.cannonsRight = self:buildCannons()
+    self.drowners = {}
 end
 
-function ship:getTimeToShoot()
-    return 1 + self.maxReloadTime * (1 - self:getCrewAtCannonsFactor())
+function ship:buildCannons()
+    -- For self.totalCrew create cannons for each side at -90 and 90 degrees
+    local cannonsRight = {}
+    local cannonsLeft = {}
+
+    for i = 1, self.totalCrew do
+        local columnLength = self.width * 0.6
+        local columnOffset = (columnLength / self.totalCrew) * (i - 1)
+        local columnStart = (columnLength / 2) * -1
+        local rowLength = 20
+        local rowStart = (rowLength / 2) * -1
+
+        table.insert(cannonsRight, Cannon(columnOffset, columnStart, rowLength, rowStart, 90, self.team))
+        table.insert(cannonsLeft, Cannon(columnOffset, columnStart, 0, rowStart, -90, self.team))
+    end
+
+    return cannonsLeft, cannonsRight
+
 end
 
 function ship:update()
-    if(not self.activeCollision) then
-        self.collideTimer += deltaTime;
-        if(self.collideTimer >= self.collideTime) then
-            self.collideTimer = 0;
-            self.activeCollision = true
-        end
+    if(self.totalCrew <= 0) then
+        self:destroy()
     end
-    if(not self.canShootRight) then
-        self.shootTimerR += deltaTime;
-        if(self.shootTimerR >= self:getTimeToShoot()) then
-            self.shootTimerR = 0;
-            self.canShootRight = true
-        end
-    end
-    if(not self.canShootLeft) then
-        self.shootTimerL += deltaTime;
-        if(self.shootTimerL >= self:getTimeToShoot()) then
-            self.shootTimerL = 0;
-            self.canShootLeft = true
-        end
-    end
-    self:rotate(self.rotationSpeed)
-    local t = 0.25;
-    --if(math.abs(self.rotationSpeed)  >= math.abs(self.desiredRotationSpeed)) then
-    --    t = 0.01
-    --end
-    self.rotationSpeed = lerp(self.rotationSpeed, self.desiredRotationSpeed, t);
-    local dirX,dirY = convertDegreesToXY(self.direction)
 
-    self.moveSpeed = lerp(self.moveSpeed, self.desiredSpeed, 0.01)
-    self.dx = self.moveSpeed * dirX * deltaTime;
-    self.dy = self.moveSpeed * dirY * deltaTime;
-    self:move(self.dx,self.dy)
+    self:rotate(self.rotationSpeed)
+    local dirX, dirY = convertDegreesToXY(self.direction)
+    local speed = self.maxSpeed * self:getCrewAtSailFactor()
+    -- TODO: Get previous direction by normalizing the dx, ty vector
+    -- TODO: Calculate in previous movement vector, to get accelerated change
+    local waterResistance = 0.7
+    local oldVec = playdate.geometry.vector2D.new(self.dx, self.dy)
+    self.dy = speed * dirY
+    self.dx = speed * dirX
+    local vec = playdate.geometry.vector2D.new(self.dx, self.dy)
+    if (vec:magnitude() > self.maxSpeed) then
+        vec:normalize()
+        vec:scale(self.maxSpeed)
+    end
+
+    vec = oldVec:scaledBy(1 - waterResistance) + vec:scaledBy(waterResistance)
+
+    self.dx, self.dy = vec:unpack()
+
+    ship.super.update(self)
+
+    self.rotationSpeed  = self.rotationSpeed * 0.99
+    if self.rotationSpeed < 0.001 and self.rotationSpeed > -0.001 then
+        self.rotationSpeed = 0
+    end
+end
+
+function ship:setRotationSpeed(rotationForce)
+    self.rotationSpeed += rotationForce / 2
+    self.rotationSpeed = clamp(self.rotationSpeed, -self.maxRotationSpeed, self.maxRotationSpeed)
 end
 
 function ship:shootRight()
-    if(self.canShootRight)then
-        if(self:getCrewAtCannonsFactor() == 0) then
-            return
-        end
-        self.canShootRight = false
-        self.cannonballright:shoot(self.x + self.width/2, self.y + self.height/2, self.direction + 90, self.dx, self.dy)
-    end
+    self:shoot(true)
 end
+
 function ship:shootLeft()
-    if(self.canShootLeft)then
-        if(self:getCrewAtCannonsFactor() == 0) then
+    self:shoot(false)
+end
+
+function ship:shoot(toRight)
+    if(self:getCrewAtCannonsFactor() == 0) then
+        return
+    end
+
+    local cannons = toRight and self.cannonsRight or self.cannonsLeft
+
+    -- Iterate through the cannons and check wich one is ready to shoot. Only look at the firs few cannons equal to the amount of self.crewAtCannons
+    for i = 1, self.crewAtCannons do
+        local cannon = cannons[i]
+        if cannon:isReadyToShoot() then
+            cannon:shoot(self.x, self.y, self.dx, self.dy, self.direction)
             return
         end
-        self.canShootLeft = false
-        self.cannonballleft:shoot(self.x + self.width/2, self.y + self.height/2, self.direction - 90, self.dx, self.dy)
     end
 end
 
-function ship:setRotationSpeed(value)
-    if(self:getCrewAtSailFactor() ~= 0) then
-        self.desiredRotationSpeed = value
-    else
-        self.desiredRotationSpeed = lerp(0, value, self.moveSpeed/self.maxSpeed)
-    end
-end
-
-function ship:draw()
-    ship.super.draw(self)
-    self.cannonballright:draw(cameraX,cameraY)
-    self.cannonballright:draw(cameraX,cameraY)
-end
-
-function ship:collide(object)
-    if(self.team == object.team) then return end
-    if(self.activeCollision and collides(self, object)) then
-        self:registerCollision()
-        object:registerCollision()
-    end
-end
-
-function ship:registerCollision()
-    self:damage()
-    self.activeCollision = false;
-end
-function ship:damage()
-    screenShake(500, 5)
+function ship:receiveDamage(_)
     self:dropCrew()
-    if(self.totalCrew <= 0) then
-        self:destroy()
-        self.cannonballleft:destroy()
-        self.cannonballright:destroy()
-    end
 end
 
 function ship:getCrewAtSailFactor()
@@ -175,5 +154,30 @@ function ship:dropCrew()
     end
     if self.totalCrew > 0 then
         self.totalCrew = self.totalCrew - 1
+        -- table.insert(self.drowners, drowner(self.x, self.y, self.direction))
     end
+end
+
+class("playerShip").extends("ship")
+
+function playerShip:init(x, y, direction, width, height, imagePath, team, damageOutput, health, totalCrew, maxSpeed, maxRotationSpeed)
+    playerShip.super.init(self, x, y, direction, width, height, imagePath, team, damageOutput, health, totalCrew, maxSpeed, maxRotationSpeed)
+    self.immunityTimer = playdate.timer.new(2000)
+    self.immunityTimer.discardOnCompletion = false
+    self.immunityTimer.value = 2000
+end
+
+function playerShip:receiveDamage(_)
+    -- As long as the immunity timer runs, no damage will be received.
+    if self.immunityTimer.timeLeft > 0 then
+        print("Ship immune")
+        return
+    end
+
+    self:dropCrew()
+
+    screenShake(500, 5)
+
+    -- Restart immunity timer.
+    self.immunityTimer:reset()
 end
