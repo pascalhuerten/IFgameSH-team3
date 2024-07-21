@@ -26,7 +26,7 @@ end
 
 function destroyObject(object)
 	for i,v in pairs(objects) do
-		if(v == object) then table.remove(objects, v); return end
+		if(v == object) then table.remove(objects, i); return end
 	end
 end
 
