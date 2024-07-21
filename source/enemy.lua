@@ -1,12 +1,14 @@
 class("enemy").extends()
 
-local distanceToStop = 160
+local distanceToStop = 150
 
 function enemy:init(playerShip)
     self.ship = ship(200, 200, 74, 40, 40, config.enemyShipImagePath, true, 50, 1, 5)
     self.target = playerShip
     self.waitForAction = 0.5
     self.time = 0
+    self.directionToTarget = 0
+    self.deltaRotation = 0
 end
 
 function enemy:update()
@@ -17,35 +19,39 @@ function enemy:update()
     else
         return
     end
-    local distance = (self.target.x - self.ship.x) * (self.target.x - self.ship.x) + (self.target.y - self.ship.y) *  (self.target.y - self.ship.y);
-    local directionX = self.ship.x - self.target.x
-    local directionY = self.ship.x - self.target.y
-    local direction = xyToDegrees(directionX, directionY)
-    print(direction, distance)
-    print()
-    if(direction < 0) then
-        if(-105 < direction) then
-            self.ship:setRotationSpeed(45)
-        elseif (direction > -75) then
-            self.ship:setRotationSpeed(-45)
-        else
-            self.ship:crewToCannons()
-            self.ship:shootLeft()
+    local dirX = self.target.x - self.ship.x
+    local dirY = self.target.y - self.ship.y
+    local distance = math.sqrt((dirX) * (dirX) + (dirY) *  (dirY));
+    local dx = dirX/distance
+    local dy = dirY/distance
+    self.directionToTarget = xyToDegrees(dx, dy)
+    self.deltaRotation = self.directionToTarget - self.ship.direction
+    self.deltaRotation = self.deltaRotation%360
+    local rotAbsNormalized = math.abs(self.deltaRotation - 180)
+    if(distance > distanceToStop * 2) then
+        self.ship:setRotationSpeed(self.deltaRotation)
+        while self.ship.crewAtSail < self.ship.totalCrew do
+            self.ship:crewToSail()
         end
     else
-        if(75 < direction) then
-            self.ship:setRotationSpeed(45)
-        elseif (direction > 105) then
-            self.ship:setRotationSpeed(-45)
-        else 
-            self.ship:crewToCannons()
-            self.ship:shootRight()
+        if(self.ship.crewAtSail ~= 1)then
+            self.ship:crewToSail()
+        end
+        if(rotAbsNormalized < 70 or rotAbsNormalized > 110) then
+            local d = 1
+            if((self.deltaRotation - 180) * -1 < 0) then
+                d = -1
+            end
+            self.ship:setRotationSpeed(45 * d)
+        else
+            self.ship:setRotationSpeed(0)
         end
     end
-    if(distance >= distanceToStop) then
-        self.ship:crewToSail()
-        return;
-    elseif(distance <= distanceToStop/2) then
-        self.ship:crewToCannons()
+    if((250 < self.deltaRotation and self.deltaRotation < 290)
+            or (-250 > self.deltaRotation and self.deltaRotation < -290)) then
+        self.ship:shootLeft()
+    elseif((70 < self.deltaRotation and self.deltaRotation < 110)
+            or (-70 > self.deltaRotation and self.deltaRotation < -110)) then
+        self.ship:shootRight()
     end
 end

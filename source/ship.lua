@@ -56,9 +56,9 @@ function ship:update()
     end
     self:rotate(self.rotationSpeed)
     local t = 0.25;
-    if(math.abs(self.rotationSpeed)  >= math.abs(self.desiredRotationSpeed)) then
-        t = 0.01
-    end
+    --if(math.abs(self.rotationSpeed)  >= math.abs(self.desiredRotationSpeed)) then
+    --    t = 0.01
+    --end
     self.rotationSpeed = lerp(self.rotationSpeed, self.desiredRotationSpeed, t);
     local dirX,dirY = convertDegreesToXY(self.direction)
 
@@ -102,8 +102,8 @@ function ship:draw()
 end
 
 function ship:collide(object)
-    if(object == self.cannonballleft or object == self.cannonballright) then return end
-    if(self.activeCollision and object.activeCollision and self.team ~= object.team and collides(self, object)) then
+    if(self.team == object.team) then return end
+    if(self.activeCollision and collides(self, object)) then
         self:registerCollision()
         object:registerCollision()
     end

@@ -13,6 +13,11 @@ function object:init(x, y, width, height, direction, imagePath, enableRotation, 
     self.enableRotation = enableRotation
     self.width = width
     self.height = height
+    registerObject(self)
+    self.active = true
+    self.onDestroyCallback = function ()
+        
+    end
     if isGif(imagePath) then
         self.imageTable = gfx.imagetable.new(imagePath)
         self.sprite = createSpriteFromImage(self.imageTable:getImage(self.currentFrame))
@@ -28,12 +33,7 @@ function object:init(x, y, width, height, direction, imagePath, enableRotation, 
     else
         self.sprite = createSpriteFromImage(image)
     end
-    self.sprite:setCenter(0,0.25)
-    self.key = registerObject(self)
-    self.active = true
-    self.onDestroyCallback = function ()
-        
-    end         
+    self.sprite:setCenter(0,0)
 end
 
 function object:move(dx,dy)
@@ -93,6 +93,6 @@ end
 
 function object:destroy()
     self.sprite:remove()
-    destroyObject(self.key)
+    destroyObject(self)
     self.active = false
 end

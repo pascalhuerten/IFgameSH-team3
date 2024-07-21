@@ -53,9 +53,14 @@ end
 function xyToDegrees(x,y) 
     local rad = math.atan(y/x);   -- arcus tangent in radians
     local deg = rad*180/math.pi;  -- converted to degrees
-    if (x<0) then deg += 180 end  --    // fixed mirrored angle of arctan
-    local eul = (270+deg)%360;    -- folded to [0,360) domain
-    return eul;
+    if (x < 0 and y < 0)then -- // quadrant Ⅲ
+        deg = 180 + deg;
+    elseif (x < 0) then -- // quadrant Ⅱ
+        deg = 180 + deg; --// it actually substracts
+    elseif (y < 0) then -- // quadrant Ⅳ
+        deg = 270 + (90 + deg); -- // it actually substracts
+    end
+    return deg;
 end
 function isOnScreen(x, y, threshold)
     return x >= 0 - threshold and x <= 400 + threshold and y >= 0 - threshold and y <= 240 + threshold

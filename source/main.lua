@@ -21,7 +21,6 @@ local objects = {}
 objects = {
 }
 function registerObject(object)
-	print("registering...", object)
 	table.insert(objects,object)
 end
 
@@ -59,19 +58,18 @@ local function loadGame()
 end
 
 loadGame()
-print(#objects)
+
 local function updateGame()
 	playdate.timer.updateTimers()
 	enemy:update()
 	for i, v in pairs(objects) do
-		if(v.active) then
+		if(v.active and v.update) then
 			v:update()
 		end
 	end
-	camera:update(player.ship.x, player.ship.y)
+	camera:update(player.ship.x + player.ship.width / 2, player.ship.y + player.ship.height / 2)
 	cameraX, cameraY = camera.x, camera.y
 	detectCollision()
-	kraken:update()
 	sea:update()
 	wind:update()
 	local cannonCount = 1
@@ -90,9 +88,9 @@ end
 
 function detectCollision()
 	for i1, v1 in pairs(objects) do
-		if(not v1.active) then goto continue1 end
+		if(not v1.active or not v1.collide) then goto continue1 end
 		for i2, v2 in pairs(objects) do
-			if(not v2.active) then goto continue2 end
+			if(not v2.active or not v2.collide) then goto continue2 end
 			if (v1 ~= v2) then
 				v1:collide(v2)
 			end

@@ -8,6 +8,8 @@ function kraken:init(x, y)
     self.warnings = {}
     self.spawnDelay = 1.3 -- Delay in seconds between spawns
     self.lastSpawnTime = 0 -- Time since last spawn
+    self.team = 2
+    self.HP = 100;
 end
 
 function kraken:update()
@@ -16,7 +18,6 @@ function kraken:update()
     -- Update warnings and spawn tentacles
     for i = #self.warnings, 1, -1 do
         local warning = self.warnings[i]
-        warning:update()
         if warning:isExpired() then
             -- Replace warning with tentacle
             table.insert(self.tentacles, tentacle(warning.x, warning.y, warning.direction))
@@ -58,15 +59,24 @@ function kraken:update()
     end
 end
 
-function kraken:draw()
-    kraken.super.draw(self)
-    -- Draw warnings
-    for i, warning in ipairs(self.warnings) do
-        warning:draw()
+function kraken:collide(object)
+    if(self.team == object.team) then return end
+    if((object.activeCollision == nil or object.activeCollision) and object.active and collides(self, object)) then 
+        object:registerCollision()
+        self:registerCollision()
     end
-    -- Draw tentacles
-    for i, tentacle in ipairs(self.tentacles) do
-        tentacle:draw()
+end
+
+function kraken:registerCollision()
+    self.HP -= 10;
+    if(self.HP <= 0) then
+        self:destroy()
+        for index, value in ipairs(self.tentacles) do
+            value:destroy()
+        end
+        for index, value in ipairs(self.warnings) do
+            value:destroy()
+        end
     end
 end
 
@@ -77,6 +87,19 @@ function tentacle:init(x, y, direction)
     tentacle.super.init(self, x, y, 40, 40, direction, config.tentacleImagePath, false, 140)
     self.sprite:setZIndex(-10)
     self.timer = 0
+    self.team = 2
+end
+
+function tentacle:collide(object)
+    if(self.team == object.team) then return end
+    if(object.enableCollision and object.active and collides(self, object)) then 
+        object:registerCollision()
+        self:registerCollision()
+    end
+end
+
+function tentacle:registerCollision()
+    print("tentacle collides!")
 end
 
 function tentacle:isExpired()
