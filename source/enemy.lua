@@ -3,7 +3,7 @@ class("enemy").extends()
 local distanceToStop = 150
 
 function enemy:init(playerShip)
-    self.ship = ship(200, 200, 74, 40, 40, config.enemyShipImagePath, true, 50, 1, 5)
+    self.ship = ship(math.random(-1000, 1000), math.random(-1000, 1000), 74, 40, 40, config.enemyShipImagePath, true, 50, 1, 5)
     self.target = playerShip
     self.waitForAction = 0.5
     self.time = 0
@@ -34,8 +34,10 @@ function enemy:update()
             self.ship:crewToSail()
         end
     else
-        if(self.ship.crewAtSail ~= 1)then
+        if(self.ship.crewAtSail < 1)then
             self.ship:crewToSail()
+        elseif(self.ship.crewAtSail > 1) then
+            self.ship:crewToCannons()
         end
         if(rotAbsNormalized < 70 or rotAbsNormalized > 110) then
             local d = 1

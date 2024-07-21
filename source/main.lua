@@ -15,6 +15,9 @@ import "cannonball"
 import "enemy"
 import "SoundController"
 import "CoreLibs/timer"
+import "arrow"
+
+screenWidth, screenHeight = playdate.display.getSize()
 
 local objects = {}
 
@@ -35,15 +38,14 @@ local font = gfx.font.new('font/Mini Sans 2X') -- DEMO
 
 
 local sea = sea()
-local kraken = kraken(400, 200)
+local kraken = kraken(math.random(-1000, 1000), math.random(-1000, 1000))
 local player = player()
 local camera = camera(player.ship.x, player.ship.y)
 local wind = wind(40, math.pi * 0.8)
 local hud = hud()
 local enemy = enemy(player.ship);
 soundController = SoundController()
-
-
+local arrow = arrow(enemy.ship, player.ship, kraken)
 
 local function loadGame()
 	playdate.display.setRefreshRate(50)           -- Sets framerate to 50 fps
@@ -72,13 +74,11 @@ local function updateGame()
 	detectCollision()
 	sea:update()
 	wind:update()
-	local cannonCount = 1
-	local sailCount = 5
 	hud:update({
 		crewAtCannons = player.ship.crewAtCannons,
 		crewAtSail = player.ship.crewAtSail
 	})
-
+	arrow:update()
 	if kraken.sprite:isVisible() then
 		soundController:playBattleSoundtrack()
 	else
@@ -118,6 +118,7 @@ local function drawGame()
 	kraken:draw()
 	gfx.sprite.update()
 	hud:draw()
+	arrow:draw()
 end
 
 function playdate.update()

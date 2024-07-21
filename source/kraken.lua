@@ -10,6 +10,7 @@ function kraken:init(x, y)
     self.lastSpawnTime = 0 -- Time since last spawn
     self.team = 2
     self.HP = 100;
+    self.sprite:setCenter(0,0)
 end
 
 function kraken:update()
