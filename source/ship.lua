@@ -14,6 +14,9 @@ function ship:init(x, y, direction, width, height, imagePath, team, damageOutput
     self.crewAtSail = 0;
     self.cannonsLeft, self.cannonsRight = self:buildCannons()
     self.drowners = {}
+    self.immunityTimer = playdate.timer.new(2000)
+    self.immunityTimer.discardOnCompletion = false
+    self.immunityTimer.value = 2000
 end
 
 function ship:buildCannons()
@@ -98,10 +101,6 @@ function ship:shoot(toRight)
     end
 end
 
-function ship:receiveDamage(_)
-    self:dropCrew()
-end
-
 function ship:getCrewAtSailFactor()
     return self.crewAtSail / self.totalCrew
 end
@@ -158,16 +157,7 @@ function ship:dropCrew()
     end
 end
 
-class("playerShip").extends("ship")
-
-function playerShip:init(x, y, direction, width, height, imagePath, team, damageOutput, health, totalCrew, maxSpeed, maxRotationSpeed)
-    playerShip.super.init(self, x, y, direction, width, height, imagePath, team, damageOutput, health, totalCrew, maxSpeed, maxRotationSpeed)
-    self.immunityTimer = playdate.timer.new(2000)
-    self.immunityTimer.discardOnCompletion = false
-    self.immunityTimer.value = 2000
-end
-
-function playerShip:receiveDamage(_)
+function ship:receiveDamage(_)
     -- As long as the immunity timer runs, no damage will be received.
     if self.immunityTimer.timeLeft > 0 then
         print("Ship immune")

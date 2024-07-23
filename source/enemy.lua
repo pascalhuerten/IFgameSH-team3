@@ -1,5 +1,5 @@
 class("enemy").extends()
-
+-- (_mischa) BUG: sometimes doesn't try to attack player if in range.
 local distanceToStop = 150
 
 function enemy:init(playerShip)
