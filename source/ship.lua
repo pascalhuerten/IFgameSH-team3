@@ -14,7 +14,7 @@ function ship:init(x, y, direction, width, height, imagePath, team, damageOutput
     self.crewAtSail = 0;
     self.cannonsLeft, self.cannonsRight = self:buildCannons()
     self.drowners = {}
-    self.immunityTimer = playdate.timer.new(2000)
+    self.immunityTimer = playdate.timer.new(500)
     self.immunityTimer.discardOnCompletion = false
     self.immunityTimer.value = 2000
 end
@@ -155,6 +155,16 @@ function ship:dropCrew()
         self.totalCrew = self.totalCrew - 1
         -- table.insert(self.drowners, drowner(self.x, self.y, self.direction))
     end
+end
+
+function ship:onCollisionEnter(otherObject)
+    if otherObject.team == self.team then
+        print("Friendly fire")
+        return
+    end
+
+    -- Override this function in child classes
+    self:receiveDamage(otherObject.damageOutput)
 end
 
 function ship:receiveDamage(_)

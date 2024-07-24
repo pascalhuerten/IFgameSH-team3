@@ -161,12 +161,10 @@ end
 
 function object:onCollision(otherObject)
     -- Override this function in child classes
-    if otherObject.team == self.team then
-        print("Friendly fire")
-        return
-    end
+end
 
-    self:receiveDamage(otherObject.damageOutput)
+function object:onCollisionEnter(otherObject)
+    -- Override this function in child classes
 end
 
 function object:receiveDamage(damage)

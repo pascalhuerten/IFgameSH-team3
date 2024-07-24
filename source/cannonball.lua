@@ -17,11 +17,16 @@ function cannonball:update()
     cannonball.super.update(self)
 end
 
-function cannonball:onCollision(_)
-    
+function cannonball:onCollisionEnter(otherObject)
+    if otherObject.team == self.team then
+        print("Friendly fire")
+        return
+    end
+
+    self:receiveDamage(otherObject.damageOutput)
 end
 
 function cannonball:receiveDamage(_)
-    self.destroy()
+    self:destroy()
     soundController:playCannonHit()
 end

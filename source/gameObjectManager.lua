@@ -2,6 +2,7 @@ class("GameObjectManager").extends()
 
 function GameObjectManager:init()
     self.objects = {}
+    self.previousCollisions = {}
 end
 
 function GameObjectManager:registerObject(object)
@@ -54,23 +55,40 @@ end
 
 function GameObjectManager:detectCollision()
     local activeObjects = {}
+    local currentCollisions = {}
+
+    -- Find objects that are active and have collision enabled
     for _, object in ipairs(self.objects) do
         if object.active and object.activeCollision then
             table.insert(activeObjects, object)
         end
     end
 
-
+    -- Detect collisions
     for i = 1, #activeObjects do
         for j = i + 1, #activeObjects do
             -- if self:checkCollision(activeObjects[i], activeObjects[j]) then
             if self:checkCircleCollision(activeObjects[i], activeObjects[j]) then
                 print("Detected collision for", activeObjects[j].className, activeObjects[i].className)
+                local collisionPair = tostring(activeObjects[i]) .. tostring(activeObjects[j])
+                -- Mark as collided in current cycle
+                currentCollisions[collisionPair] = true
+
+                -- If not collided in previous cycle, call onCollisionEnter
+                if not self.previousCollisions[collisionPair] then
+                    activeObjects[i]:onCollisionEnter(activeObjects[j])
+                    activeObjects[j]:onCollisionEnter(activeObjects[i])
+                end
+                
+                -- Finally call onCollision for both objects
                 activeObjects[i]:onCollision(activeObjects[j])
                 activeObjects[j]:onCollision(activeObjects[i])
             end
         end
     end
+
+    -- Update previous collisions for the next cycle
+    self.previousCollisions = currentCollisions
 end
 
 function GameObjectManager:checkCollision(object1, object2)

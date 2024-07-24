@@ -3,7 +3,7 @@ class("enemy").extends()
 local distanceToStop = 150
 
 function enemy:init(playerShip)
-    self.ship = ship(math.random(-1000, 1000), math.random(-1000, 1000), 0, 74, 40, config.enemyShipImagePath, 2, 10, 50, 3)
+    self.ship = ship(math.random(-1000, 1000), math.random(-1000, 1000), 0, 74, 40, config.enemyShipImagePath, 2, 10, 50, 5)
     self.target = playerShip
     self.waitForAction = 0.5
     self.time = 0

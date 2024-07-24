@@ -3,7 +3,7 @@ import "object"
 class("kraken").extends("object")
 
 function kraken:init(x, y)
-    kraken.super.init(self, x, y, 0, 0, nil, 80, 80, config.krakenImagePath, false, 140, 1, 10, 1000, true, {{0, 0, 55}})
+    kraken.super.init(self, x, y, 0, 0, nil, 80, 80, config.krakenImagePath, false, 140, 1, 10, 100, true, {{0, 0, 55}})
     self.tentacles = {}
     self.warnings = {}
     self.spawnDelay = 1.3 -- Delay in seconds between spawns
@@ -69,7 +69,7 @@ function kraken:update()
     end
 end
 
-function kraken:onCollision(otherObject)
+function kraken:onCollisionEnter(otherObject)
     print("Kraken hit")
     if otherObject.team == self.team then
         print("Kraken hit by same team, no damage")
@@ -89,6 +89,16 @@ end
 
 function tentacle:isExpired()
     return self.currentFrame >= self.frameCount
+end
+
+function tentacle:onCollisionEnter(otherObject)
+    if otherObject.team == self.team then
+        print("Friendly fire")
+        return
+    end
+
+    -- Override this function in child classes
+    self:receiveDamage(otherObject.damageOutput)
 end
 
 class("warning").extends("object")
