@@ -83,10 +83,25 @@ end
 
 
 function GameObjectManager:checkCircleCollision(object1, object2)
+    local rad1 = math.rad(object1.direction) -- Convert direction of object1 to radians
+    local rad2 = math.rad(object2.direction) -- Convert direction of object2 to radians
+
     for _, circle1 in ipairs(object1.collisionCircles) do
+        -- Rotate circle1's position
+        local rotatedX1 = circle1[1] * math.cos(rad1) - circle1[2] * math.sin(rad1)
+        local rotatedY1 = circle1[1] * math.sin(rad1) + circle1[2] * math.cos(rad1)
+        local absX1 = object1.x + rotatedX1
+        local absY1 = object1.y + rotatedY1
+
         for _, circle2 in ipairs(object2.collisionCircles) do
-            local dx = (object1.x + circle1[1]) - (object2.x + circle2[1])
-            local dy = (object1.y + circle1[2]) - (object2.y + circle2[2])
+            -- Rotate circle2's position
+            local rotatedX2 = circle2[1] * math.cos(rad2) - circle2[2] * math.sin(rad2)
+            local rotatedY2 = circle2[1] * math.sin(rad2) + circle2[2] * math.cos(rad2)
+            local absX2 = object2.x + rotatedX2
+            local absY2 = object2.y + rotatedY2
+
+            local dx = absX1 - absX2
+            local dy = absY1 - absY2
             local distance = math.sqrt(dx^2 + dy^2)
             if distance < (circle1[3] + circle2[3]) then
                 return true
