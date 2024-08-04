@@ -69,7 +69,7 @@ function GameObjectManager:detectCollision()
         for j = i + 1, #activeObjects do
             -- if self:checkCollision(activeObjects[i], activeObjects[j]) then
             if self:checkCircleCollision(activeObjects[i], activeObjects[j]) then
-                print("Detected collision for", activeObjects[j].className, activeObjects[i].className)
+                -- print("Detected collision for", activeObjects[j].className, activeObjects[i].className)
                 local collisionPair = tostring(activeObjects[i]) .. tostring(activeObjects[j])
                 -- Mark as collided in current cycle
                 currentCollisions[collisionPair] = true

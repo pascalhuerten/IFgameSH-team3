@@ -19,7 +19,6 @@ end
 
 function cannonball:onCollisionEnter(otherObject)
     if otherObject.team == self.team then
-        print("Friendly fire")
         return
     end
 

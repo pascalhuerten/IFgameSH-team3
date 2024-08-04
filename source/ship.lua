@@ -10,10 +10,10 @@ function ship:init(x, y, direction, width, height, imagePath, team, damageOutput
     self.maxRotationSpeed = maxRotationSpeed or 100
     self.cannonballSpeed = 120
     self.totalCrew = totalCrew
+    self.originalCrew = totalCrew
     self.crewAtCannons = self.totalCrew;
     self.crewAtSail = 0;
     self.cannonsLeft, self.cannonsRight = self:buildCannons()
-    self.drowners = {}
     self.immunityTimer = playdate.timer.new(500)
     self.immunityTimer.discardOnCompletion = false
     self.immunityTimer.value = 2000
@@ -24,6 +24,20 @@ function ship:buildCannons()
     local cannonsRight = {}
     local cannonsLeft = {}
 
+    -- Store existing cannons and their reload timers
+    local existingCannonsRight = self.cannonsRight or {}
+    local existingCannonsLeft = self.cannonsLeft or {}
+    local reloadTimersRight = {}
+    local reloadTimersLeft = {}
+
+    for i, cannon in ipairs(existingCannonsRight) do
+        reloadTimersRight[i] = cannon.reloadTimer
+    end
+
+    for i, cannon in ipairs(existingCannonsLeft) do
+        reloadTimersLeft[i] = cannon.reloadTimer
+    end
+
     for i = 1, self.totalCrew do
         local columnLength = self.width * 0.6
         local columnOffset = (columnLength / self.totalCrew) * (i - 1)
@@ -31,12 +45,26 @@ function ship:buildCannons()
         local rowLength = 20
         local rowStart = (rowLength / 2) * -1
 
-        table.insert(cannonsRight, Cannon(columnOffset, columnStart, rowLength, rowStart, 90, self.team))
-        table.insert(cannonsLeft, Cannon(columnOffset, columnStart, 0, rowStart, -90, self.team))
+        local cannonRight = Cannon(columnOffset, columnStart, rowLength, rowStart, 90, self.team)
+        local cannonLeft = Cannon(columnOffset, columnStart, 0, rowStart, -90, self.team)
+
+        -- Map existing reload timers to new cannons
+        if reloadTimersRight[i] then
+            cannonRight.reloadTimer = reloadTimersRight[i]
+        end
+
+        if reloadTimersLeft[i] then
+            cannonLeft.reloadTimer = reloadTimersLeft[i]
+        end
+
+        table.insert(cannonsRight, cannonRight)
+        table.insert(cannonsLeft, cannonLeft)
     end
 
-    return cannonsLeft, cannonsRight
+    self.cannonsLeft = cannonsLeft
+    self.cannonsRight = cannonsRight
 
+    return cannonsLeft, cannonsRight
 end
 
 function ship:update()
@@ -46,9 +74,12 @@ function ship:update()
 
     self:rotate(self.rotationSpeed)
     local dirX, dirY = convertDegreesToXY(self.direction)
-    local speed = self.maxSpeed * self:getCrewAtSailFactor()
-    -- TODO: Get previous direction by normalizing the dx, ty vector
-    -- TODO: Calculate in previous movement vector, to get accelerated change
+    local minSpeed = self.maxSpeed * 0.5
+    -- Gain should be a factor that makes maxPossibleSpeed be maxSpeed at totalCrew = originalCrew
+    local gain = ((self.maxSpeed - minSpeed) / self.originalCrew) * self.totalCrew
+    local maxPossibleSpeed = minSpeed + gain
+    local speed = maxPossibleSpeed * self:getCrewAtSailFactor()
+
     local waterResistance = 0.7
     local oldVec = playdate.geometry.vector2D.new(self.dx, self.dy)
     self.dy = speed * dirY
@@ -133,6 +164,9 @@ function ship:pickupCrew()
     else
         self.crewAtCannons = self.crewAtCannons + 1
     end
+
+    -- Rebuild cannons to adapt to new crew count.
+    self.cannonsLeft, self.cannonsRight = self:buildCannons()
 end
 
 function ship:dropCrew()
@@ -153,24 +187,28 @@ function ship:dropCrew()
     end
     if self.totalCrew > 0 then
         self.totalCrew = self.totalCrew - 1
-        -- table.insert(self.drowners, drowner(self.x, self.y, self.direction))
+        drowner(self.x, self.y, self.team)
+
+        -- Rebuild cannons to adapt to new crew count.
+        self.cannonsLeft, self.cannonsRight = self:buildCannons()
     end
 end
 
 function ship:onCollisionEnter(otherObject)
-    if otherObject.team == self.team then
-        print("Friendly fire")
-        return
+    if otherObject.className == "drowner" then
+        self:pickupCrew()
+        otherObject:destroy()
+    else
+        if otherObject.team == self.team then
+            return
+        end
+        self:receiveDamage(otherObject.damageOutput)
     end
-
-    -- Override this function in child classes
-    self:receiveDamage(otherObject.damageOutput)
 end
 
 function ship:receiveDamage(_)
     -- As long as the immunity timer runs, no damage will be received.
     if self.immunityTimer.timeLeft > 0 then
-        print("Ship immune")
         return
     end
 

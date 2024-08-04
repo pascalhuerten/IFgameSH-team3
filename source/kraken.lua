@@ -18,7 +18,6 @@ function kraken:update()
         for _, v in ipairs(self.warnings) do
             v:destroy()
         end
-        print("Kraken killed!")
         self:destroy()
         return
     end
@@ -70,9 +69,7 @@ function kraken:update()
 end
 
 function kraken:onCollisionEnter(otherObject)
-    print("Kraken hit")
     if otherObject.team == self.team then
-        print("Kraken hit by same team, no damage")
         return
     end
 
@@ -93,7 +90,6 @@ end
 
 function tentacle:onCollisionEnter(otherObject)
     if otherObject.team == self.team then
-        print("Friendly fire")
         return
     end
 
